@@ -103,6 +103,7 @@ Trong thời đại AI coding assistant như OpenAi ChatGPT, Anthropic Claude ha
 
 
 1. AI viết code rất nhanh - nhưng không đảm bảo đúng.
+
 AI thường:
 - Sinh code "trông rất chi là hợp lý".
 - Syntax đẹp.
@@ -123,6 +124,7 @@ Nguy hiểm ở chỗ:
 
 
 2. TDD biến test thành specification cho AI.
+
 Trong TDD, developer viết test trước:
 
 **RED:**
@@ -153,6 +155,7 @@ Tức là:
 
 
 3. TDD giúp chống hallucination của AI
+
 AI có thể:
 - Gọi sai method.
 - Dùng sai comparsion (!= thay vì .equals())
@@ -172,6 +175,7 @@ Kho có TDD:
 Developer phát hiện lỗi sớm trước khi lên production.
 
 4. TDD tạo "checks and balances" cho workflow AI
+
 AI mạnh nhưng không đáng tin cậy tuyệt đối.
 Vì vậy workflow hiệu quả nhât là:
 ```
@@ -193,6 +197,7 @@ Kent Beck gọi đây là:
 | checks and balances to avoid hallucinations.
 
 5. TDD giúp developer giữ quyền kiểm soát thiết kế hệ thống
+
 Nếu chỉ prompt AI:
 - Architecture dễ lộn xộn.
 - Couping cao.
@@ -213,6 +218,7 @@ AI chỉ implement theo spec.
 
 
 6. Refactor AI-generated code an toàn hơn.
+
 AI thường generate:
 - Verbose code.
 - Naming chưa tốt.
@@ -239,6 +245,7 @@ mà không sợ phá behavior.
 
 
 7. CI/CD + TDD = lớp bảo vệ cuối cùng
+
 Một vấn đề nguy hiểm khi dùng AI là:
 | Automation bias.
 
