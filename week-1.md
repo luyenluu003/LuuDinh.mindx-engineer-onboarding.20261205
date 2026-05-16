@@ -74,7 +74,7 @@ TDD thường tuân thủ theo chu trình "Red-Green-Refactor", dưới đây l�
         return 10;
     }
 
-    Sau đó mới cải thiện dần sang 
+    //Sau đó mới cải thiện dần sang 
 
     public int max(int a, int b) {
         return Math.max(a, b);
