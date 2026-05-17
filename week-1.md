@@ -1083,21 +1083,21 @@ Tests giúp mình xá minh AI code theo mất cách:
 Trước khi merge AI-generated code, mình cần check:
 
 ```
-□ AI code đã được chạy qua static analysis tool (EsLint, SonarQube) chưa?
-□ Có unit tests cho mọi functions/methods không?
-□ Tests đã cover happy  path và edge cases chưa?
-□ Đã verify logic đúng với requirements chưa?
-□ Business rules được implement đúng chưa?
-□ Security đẫ scan đã pass chưa? (XSS, SQL Injection, authentication)
-□ Dependecies mới có known vulnerbilities không?
-□ Error handling có đầy đủ không? (null checks, exception handling)
-□ AI code có align với existing architecture không?
-□ Có documentation cho logic phức tạp không?
-□ Đã có người hiểu code này trong team chưa?
-□ Code không có "comprehension debt" - tức ai cũng hiểu được?
-□ Performance implications đã được xem xét chưa?
-□ Concurrency issues đã được test chưa?
-□ Regression tests pass với code mới chưa?
+- AI code đã được chạy qua static analysis tool (EsLint, SonarQube) chưa?
+- Có unit tests cho mọi functions/methods không?
+- Tests đã cover happy  path và edge cases chưa?
+- Đã verify logic đúng với requirements chưa?
+- Business rules được implement đúng chưa?
+- Security đẫ scan đã pass chưa? (XSS, SQL Injection, authentication)
+- Dependecies mới có known vulnerbilities không?
+- Error handling có đầy đủ không? (null checks, exception handling)
+- AI code có align với existing architecture không?
+- Có documentation cho logic phức tạp không?
+- Đã có người hiểu code này trong team chưa?
+- Code không có "comprehension debt" - tức ai cũng hiểu được?
+- Performance implications đã được xem xét chưa?
+- Concurrency issues đã được test chưa?
+- Regression tests pass với code mới chưa?
 ```
 
 ---
