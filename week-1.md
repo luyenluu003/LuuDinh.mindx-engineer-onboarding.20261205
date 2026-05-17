@@ -309,3 +309,151 @@ Hai thứ này không đối lập - mà bổ trợ cho nhau rất mạnh trong 
 
 
 ---
+
+## 2. Testing Levels Comparison
+
+### 2.1 Unit Tests
+
+**Định nghĩa:**
+Unit Testing là level đầu tiên của quá trình testing. Cái mình cần test ở đây là những thành phần nhỏ nhất của ứng dụng - tưởng tượng như test một hàm riêng lẻ, một method đơn lẻ. Mục đích chính là đảm bảo mỗi "mảnh" code hoạt động đúng trước khi ghép chúng lại với nhau.
+
+Điểm hay của unit test là nó chạy rất nhanh, thường chỉ vài miliseconds thôi. Nhờ vậy mà trong quá trình code, mình có thể chạy test liên tục để biết ngay nếu có gì đó sai.
+
+**Khi nào nên dùng:**
+- Khi muốn test một function cụ thể, không muốn phụ thuộc vào các phần khác.
+- Khi cần feedback nhanh trong quá trình phát triển.
+- Khi muốn xác minh logic core của ứng dụng hoạt động đúng.
+- Khi cần debug dễ dàng, biết chính xác chỗ nào fail.
+
+**Ví dụ code:**
+```Java với JUnit
+    @Test
+    public void testAddNumbers() {
+        Calculator calc = new Calculator();
+        int result = calc.add(2, 3);
+        assertEquals(5, result);
+    }
+
+```
+
+### 2.2 Integration Tests
+
+**Định nghĩa:**
+Sau khi đã test từng phần riêng lẻ xong rồi, bước tiếp theo là Integration Testing. Cái mình test ở đây là xem các modules có "nói chuyện" được với nhau không. Ví dụ module A gọi module B, truyền data qua lại - thì nó có hoạt động trơn tru không?
+
+Thực ra thì nhiều khi các phần riêng lẻ đều chạy đúng, nhưng khi ghép lại thì lại có vấn đề. Có thể là data format không match, có thể là timing issue, có thể là interface không tương thích, Integration test giúp mình phát hiện những thứ đó.
+
+**Khi nào nên dùng:**
+- Khi đã test xong unit tests và muốn xác nhận modules giao tiếp đúng.
+- Khi cần test API calls, database operations, file I/O.
+- Khi muốn verify data flow giữa các services.
+- Khi cần test những thứ mà unit test không thể mock được.
+
+**Ví dụ code:**
+
+```javascript
+    // Test database integration
+    describe('UserRepository Integration', () => {
+    it('tạo user mới thì có thể query lại được', async () => {
+        const repo = new UserRepository();
+        const newUser = { name: 'Minh', email: 'minh@test.com' };
+        
+        const created = await repo.create(newUser);
+        const found = await repo.findById(created.id);
+        
+        expect(found).not.toBeNull();
+        expect(found?.name).toBe('Minh');
+        expect(found?.email).toBe('minh@test.com');
+    });
+    it('user có tickets thì query user thì thấy tickets', async () => {
+        const userRepo = new UserRepository();
+        const ticketRepo = new TicketRepository();
+        
+        const user = await userRepo.create({ name: 'Lan', email: 'lan@test.com' });
+        await ticketRepo.create({ userId: user.id, title: 'Bug #1' });
+        await ticketRepo.create({ userId: user.id, title: 'Bug #2' });
+        
+        const userWithTickets = await userRepo.findWithTickets(user.id);
+        
+        expect(userWithTickets?.tickets).toHaveLength(2);
+    });
+    });
+    // Test API integration
+    describe('AuthService Integration', () => {
+    it('đăng nhập thành công thì trả về token', async () => {
+        const authService = new AuthService();
+        
+        const result = await authService.login('minh@test.com', 'password123');
+        
+        expect(result.token).toBeDefined();
+        expect(result.user.email).toBe('minh@test.com');
+    });
+    });
+```
+
+### 2.3 End-to-End (E2E) Tests
+
+**Định nghĩa:**
+Đây là level cuối cùng, test toàn bộ hệ thống như người dùng thật sự sử dụng. Mình không test riêng từng module nữa, mà mô phỏng toàn bộ user flow từ đầu đến cuối. Ví dụ: user đăng nhập -> tạo ticket -> gửi phản hồi -> đóng ticket. Toàn bộ flow đó phải hoạt động trơn tru.
+
+E2E test chạy chậm nhất và tốn resource nhất, nhưng nó cho mình confidence cao nhất là ứng dụng hoạt động đúng trong thực tế.
+
+**Khi nào nên dùng:**
+- Khi cần xác định toàn bộ user flow hoạt động.
+- Khi cần test những scenarios quan trọng (login, checkout, payment).
+- khi muốn đảm bảo khong có regression ở high-level.
+- Trước khi release, staging verification.
+
+**Ví dụ code:**
+
+```typescript
+    // E2E với Playwright
+    import { test, expect } from '@playwright/test';
+    test('user có thể tạo và đóng ticket', async ({ page }) => {
+    // 1. Đăng nhập
+    await page.goto('/login');
+    await page.fill('[name="email"]', 'minh@test.com');
+    await page.fill('[name="password"]', 'password123');
+    await page.click('button[type="submit"]');
+    
+    // 2. Đợi redirect về dashboard
+    await expect(page).toHaveURL('/dashboard');
+    await expect(page.locator('h1')).toContainText('Dashboard');
+    
+    // 3. Tạo ticket mới
+    await page.click('text=Tạo Ticket');
+    await page.fill('[name="title"]', 'Bug không load được trang');
+    await page.fill('[name="description"]', 'Chi tiết lỗi...');
+    await page.click('button:has-text("Gửi")');
+    
+    // 4. Verify ticket được tạo
+    await expect(page.locator('.ticket-item')).toHaveCount(1);
+    
+    // 5. Đóng ticket
+    await page.click('.ticket-item >> text=Đóng');
+    await expect(page.locator('.ticket-item >> text=Closed')).toBeVisible();
+    });
+```
+
+### 2.4 Comparison Table
+
+| Aspect             | Unit Tests                    | Integration Tests           | E2E Tests               |
+| ------------------ | ----------------------------- | --------------------------- | ----------------------- |
+| **Scope**          | Một Function/method đơn lẻ    | Nhiều modules tương tác     | Toàn bộ hệ thống        |
+| **Speed**          | Rất nhanh (ms)                | Trung bình (vài giây)       | Chậm (phút)             |
+| **Reliability**    | Cao, stable                   | Trung bình, có thể flaky    | Thấp, dễ flaky          |
+| **Debugging**      | Dễ, biết chính xác chỗ fail   | Khó hơn, cần trace nhiều    | Khó nhất                |
+| **Use for AI?**    | Rất cần, verify từng hàm      | Cần, verify interactions    | Cần cho critical flows  |
+| **Suggested Ratio**| 70%                           | 20%                         | 10%                     |
+
+### 2.5 Tỷ lệ đề xuất và giải thích
+
+**Đề xuất:**
+Đề xuất tỷ lệ 70/20/10 - tức 70% unit test, 20% integration tests, và 10% E2E tests.
+
+**Lý do:**
+- Unit tests chiếm 70%: Vì chúng chạy nhanh, dễ viết, dễ debug. Đây là "hàng não đầu tiên" để bắt bugs. Với AI-generated code, mình cần nhiều unit tests nhất đề veriry từng hàm nhỏ.
+- Integration tests chiếm 20%: Đủ đề xác nhận các modules giao tiếp đúng nhau, nhưng không quá nhiều dến nỗi chạy chậm.
+- E2E tests chiếm 10%: Chỉ tập trung vào những critical flows thực sự quan trọng. Nếu có giá nhiều E2E test thì CI/CD sẽ rất lâu và dễ fail không đáng có.
+
+---
