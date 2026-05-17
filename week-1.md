@@ -1068,21 +1068,16 @@ Tests giúp mình xá minh AI code theo mất cách:
 
 ### 4.2 Guardrails for AI-Generated Code
 
-| #   | Guardrail | Implementation |
-| --- | --------- | -------------- |
-| 1   | Static Analysis trên mọi commit          | Chạy Eslint, SonarQube, hoặc Semgrep tự động. AI code thường có style issues và prtential bugs mà tools này bắt được. Mình nên setup pre-commit hook để không commit code chưa qua scan.               |
-| 2   | Unit tests viết trước khi AI viết implementation          | Áp dụng TDD approach - viết test trước, rồi mới nhờ AI AI generate code để pass test đó. Cách này đảm bảo AI hiểu đúng requirements thay vì tự động nghĩ ra specification riêng.               |
-| 3   | Code review bắt buộc cho business logic           | AI có thể viết code chạy đúng nhưng không đúng bới business rules. Cần người có domain knowledge review phần này trước khi merge. Đặc biệt là các validation rules, calculation logic.                |
-| 4   | Security scanning chuyên sâu          | Dùng SAST tools như Snyk, Checkmarx để scan AI code. AI thường có tỷ lệ security issues cao hơn, đặc biệt là insecure deserialization (2.74x more common), XSS vulnerabilities.               |
-| 5   | Mutation Testing           | Không chỉ đo coverage, mà dùng mutation testing để verify tests thực sự catch được bugs. Line coverage 85-90% cho AI code (so với 70-80% cho human code). Teams dùng mutation testing thấy scores improve từ 70% lên 78%.               |
-| 6   | Architectural Drift Detection
-          |   	
-Verify AI code không vi phạm architecture decisions hiện tại. AI đôi khi suggest cách giải quyết không align với hệ thống. Dùng tools hoặc code review để check.             |
-| 7   |   Dependency Risk Assessment
-        |   AI có thể suggest dùng packages không cần thiết hoặc có known vulnerabilities. Scan dependencies trước khi add vào project.             |
-| 8   |  "Comprehension Debt" Awareness
-         |  Code có thể pass all tests nhưng không ai trong team thực sự hiểu nó làm gì. Đây là production risk nghiêm trọng. Cần đảm bảo có documentation và ít nhất một người trong team hiểu rõ AI-generated code.
-              |
+| # | Guardrail                            | Implementation                                                                                                                                              |
+|---|--------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 1 | Static Analysis trên mọi commit      | Chạy Eslint, SonarQube, hoặc Semgrep tự động. AI code thường có style issues và potential bugs mà tools này bắt được. Mình nên setup pre-commit hook để không commit code chưa qua scan. |
+| 2 | Unit tests viết trước khi AI viết implementation | Áp dụng TDD approach - viết test trước, rồi mới nhờ AI generate code để pass test đó. Cách này đảm bảo AI hiểu đúng requirements thay vì tự động nghĩ ra specification riêng. |
+| 3 | Code review bắt buộc cho business logic | AI có thể viết code chạy đúng nhưng không đúng với business rules. Cần người có domain knowledge review phần này trước khi merge. Đặc biệt là các validation rules, calculation logic. |
+| 4 | Security scanning chuyên sâu         | Dùng SAST tools như Snyk, Checkmarx để scan AI code. AI thường có tỷ lệ security issues cao hơn, đặc biệt là insecure deserialization (2.74x more common), XSS vulnerabilities. |
+| 5 | Mutation Testing                     | Không chỉ đo coverage, mà dùng mutation testing để verify tests thực sự catch được bugs. Line coverage 85-90% cho AI code (so với 70-80% cho human code). Teams dùng mutation testing thấy scores improve từ 70% lên 78%. |
+| 6 | Architectural Drift Detection        | Verify AI code không vi phạm architecture decisions hiện tại. AI đôi khi suggest cách giải quyết không align với hệ thống. Dùng tools hoặc code review để check. |
+| 7 | Dependency Risk Assessment           | AI có thể suggest dùng packages không cần thiết hoặc có known vulnerabilities. Scan dependencies trước khi add vào project. |
+| 8 | "Comprehension Debt" Awareness       | Code có thể pass all tests nhưng không ai trong team thực sự hiểu nó làm gì. Đây là production risk nghiêm trọng. Cần đảm bảo có documentation và ít nhất một người trong team hiểu rõ AI-generated code. |
 
 ### 4.3 AI Validation Checklist
 Trước khi merge AI-generated code, mình cần check:
