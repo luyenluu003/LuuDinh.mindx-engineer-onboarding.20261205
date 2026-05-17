@@ -1101,3 +1101,334 @@ Trước khi merge AI-generated code, mình cần check:
 ```
 
 ---
+
+## 5. Common Mistakes
+
+### 5.1 Over-Testing
+
+**Mô tả:**
+Over-testing là tình trạng viết quá nhiều tests mà không mang lại giá trị thực tế. Đây là mistake phổ biến, dặc biệt khi teams bị áp lực khi đạt 100% converage.
+
+Vấn đề là khi mình chỉ tập trung vào con số coverage, mình sẽ viết tests chỉ để "pass converage" thay vì để thực sự bắt bugs. Những tests như vậy thường rất brittle - tức là break khi code được refactor dù behavior vẫn đúng.
+
+Một dấu hiệu của over-testing là: mỗi khi sửa code, phải sửa rất nhiều tests không liên quan.
+
+**Ví dụ sai:**
+
+```typescript
+    // ❌ Over-testing: test quá chi tiết, không cần thiết
+    describe('UserService', () => {
+    it('should call userRepository.findById once', () => {
+        // Sao phải test cái này? Ai quan tâm nó gọi mấy lần?
+        expect(userRepository.findById).toHaveBeenCalledTimes(1);
+    });
+    it('should call userRepository.findById with correct id', () => {
+        // Sao phải test internal call?
+        expect(userRepository.findById).toHaveBeenCalledWith(1);
+    });
+    it('should call userRepository.findById before calling mapper.toDTO', () => {
+        // Test thứ tự internal calls là quá specification
+        const mapCall = jest.spyOn(mapper, 'toDTO');
+        service.getUser(1);
+        expect(mapCall).toHaveBeenCalledAfter(userRepository.findById);
+    });
+    it('should call logger.info when finding user', () => {
+        // Test logging là implementation detail, không phải behavior
+        expect(logger.info).toHaveBeenCalled();
+    });
+    });
+    // ❌ Over-testing: test không cần thiết
+    it('should return empty string when input is empty string', () => {
+    expect(reverseString('')).toBe('');
+    });
+    it('should return "a" when input is "a"', () => {
+    expect(reverseString('a')).toBe('a');
+    });
+    it('should return "ab" when input is "ba"', () => {
+    expect(reverseString('ba')).toBe('ab');
+    });
+    // Mấy test này test cùng một behavior (reverse string)
+    // Không cần viết nhiều như vậy
+```
+
+**Cách tránh:**
+- Viết tests dựa trên requirements, không phải dựa trên coverage target.
+- Mỗi test nên test một behavior, không phải một dòng code.
+- Coverage là metric, không phải mục tiêu. Mục tiêu là confidence vào code.
+- Nếu test break khi refactor mà behavior không đổi = test đang test implementation.
+
+### 5.2 Weak Assertions
+
+**Mô tả:**
+Weak assertions là những assertions không đủ mạnh để catch bugs thực sự. Test có thể pass nhưng code có vấn đề.
+
+Vấn đề này hay xảy ra khi mình dùng những assertions quá generic, hoặc dùng loose equality. Test pass nhưng thực ra không verify được gì nhiều.
+
+Một cách để phát hiện weak assertions: thử change giá trị excepted sang giá trị sai, xem test có fail hay không. Nếu test vấn đang pass = weak assertion.
+
+**Ví dụ sai:**
+
+```typescript
+    // ❌ Weak assertions: dùng toBeTruthy() thay vì verify cụ thể
+    it('should create user successfully', () => {
+    const result = userService.createUser({ name: 'Minh', email: 'minh@test.com' });
+    // toBeTruthy() pass với BẤT KỲ giá trị truthy nào
+    // Nếu result trả về {} thì test vẫn pass
+    expect(result).toBeTruthy();
+    });
+
+    // ❌ Weak: không verify structure của result
+    it('should return user data', () => {
+    const result = userService.getUser(1);
+    // Test pass nhưng không verify gì cả
+    expect(result).toBeDefined();
+    expect(result).not.toBeNull();
+    });
+
+    // ❌ Weak: loose equality
+    it('should return correct count', () => {
+    const result = service.getCount();
+    // == thay vì ===, có thể pass nhầm
+    // "5" == 5 sẽ pass
+    expect(result == 5).toBe(true);
+    });
+
+    // ❌ Weak: assert array length nhưng không check contents
+    it('should return users', () => {
+    const result = service.getUsers();
+    // Chỉ check có users, không check user có đúng không
+    expect(result.length).toBeGreaterThan(0);
+    });
+
+    // ❌ Weak: substring match thay vì exact match
+    it('should have error message', () => {
+    const error = service.validate(input);
+    // 'error' có thể match bất cứ thứ gì chứa 'error'
+    expect(error.message).toContain('error');
+    });
+```
+
+**Cách tránh:**
+```typescript
+    // ✅ Strong assertions: verify cụ thể những gì cần thiết
+    it('should create user with correct data', () => {
+    const result = userService.createUser({ name: 'Minh', email: 'minh@test.com' });
+    
+    // Verify structure đầy đủ
+    expect(result).toEqual({
+        id: expect.any(String),
+        name: 'Minh',
+        email: 'minh@test.com',
+        createdAt: expect.any(Date)
+    });
+    });
+
+    // ✅ Strong: dùng strict equality
+    it('should return correct count', () => {
+    const result = service.getCount();
+    expect(result).toBe(5); // === thay vì ==
+    });
+
+    // ✅ Strong: verify array contents với matcher cụ thể
+    it('should return users with correct roles', () => {
+    const result = service.getUsers();
+    expect(result).toHaveLength(3);
+    expect(result[0]).toMatchObject({ name: 'Minh', role: 'admin' });
+    expect(result[1]).toMatchObject({ name: 'Lan', role: 'user' });
+    });
+
+    // ✅ Strong: exact match khi cần
+    it('should return specific error code', () => {
+    const error = service.validate(invalidInput);
+    expect(error.code).toBe('VALIDATION_ERROR');
+    expect(error.message).toBe('Email is required');
+    });
+```
+
+### 5.3 Testing Implementation Details
+
+**Mô tả:**
+Đây là mistake cơ bản và quan trọng nhất. Testing implementation details nghĩa là test cách code implement, thay vì test behavior của code.
+
+Khi mình test implementation details:
+- Tests sẽ break khi refactor dù behavior không đổi.
+- Tests không thực sự verify code hoạt động đúng.
+- Code trở nên khó thay đổi vì sợ break tests.
+
+Điều mình nên test: Observable behavior - tức là những gì user/caller thấy được. Input gì, output gì, side effects gì (Như database được update, email được gửi)
+
+Điều mình không nên test: Internal details - tức là internal fiunction calls, private methods, thứ tự operations, caching...
+
+**Ví dụ sai:**
+
+```typescript
+    // ❌ Test implementation: kiểm tra internal calls
+    class OrderService {
+    calculateDiscount(order: Order): number {
+        const discountRepo = new DiscountRepository();
+        const discount = discountRepo.findDiscount(order.customerId);
+        return order.amount * discount;
+    }
+    }
+
+    // Test này test IMPLEMENTATION, không phải BEHAVIOR
+    it('should call discountRepository', () => {
+    const discountRepo = new DiscountRepository();
+    const service = new OrderService(discountRepo);
+    
+    service.calculateDiscount(mockOrder);
+    
+    // Sao phải quan tâm nó gọi discountRepo?
+    // Ai dùng service này quan tâm điều này không?
+    expect(discountRepo.findDiscount).toHaveBeenCalled();
+    });
+
+    // ❌ Test implementation: kiểm tra internal caching
+    it('should cache results', () => {
+    const result1 = service.getUser(1);
+    const result2 = service.getUser(1);
+    
+    // Test cache là test implementation
+    // Nếu ta bỏ cache đi, behavior vẫn đúng (cùng kết quả)
+    // Nhưng test này sẽ fail
+    expect(discountRepo.findDiscount).toHaveBeenCalledTimes(1);
+    });
+
+    // ❌ Test implementation: kiểm tra internal helper method
+    describe('processPayment', () => {
+    it('should call validateCard first', () => {
+        // Test thứ tự internal calls - không cần thiết
+    });
+    
+    it('should call chargeCard after validateCard', () => {
+        // Test implementation details
+    });
+    });
+```
+
+**Cách tránh:**
+```typescript
+    // ✅ Test BEHAVIOR: chỉ quan tâm input -> output
+    describe('OrderService', () => {
+    it('should apply discount based on customer tier', () => {
+        const order = { amount: 100, customerId: 'customer-123' };
+        
+        const result = service.calculateDiscount(order);
+        
+        // Chỉ verify kết quả cuối cùng
+        // Không quan tâm bên trong gọi gì
+        expect(result).toBe(10); // 10% discount cho premium customer
+    });
+    
+    it('should return full amount when no discount', () => {
+        const order = { amount: 100, customerId: 'new-customer' };
+        
+        const result = service.calculateDiscount(order);
+        
+        expect(result).toBe(0);
+    });
+    });
+
+    // ✅ Test observable side effects
+    it('should send email when order is placed', async () => {
+    const emailService = { send: jest.fn() };
+    const service = new OrderService(emailService);
+    
+    await service.placeOrder({ items: [...], customerEmail: 'test@example.com' });
+    
+    // Verify side effect mà caller quan tâm
+    // "Khi order được tạo, email được gửi"
+    expect(emailService.send).toHaveBeenCalledWith(
+        expect.objectContaining({
+        to: 'test@example.com',
+        subject: expect.stringContaining('Order Confirmation')
+        })
+    );
+    });
+
+    // ✅ Test public API, không test private methods
+    describe('Calculator', () => {
+    it('should return correct sum', () => {
+        expect(calculator.add(2, 3)).toBe(5);
+        expect(calculator.subtract(5, 2)).toBe(3);
+    });
+    // Không test internal methods như validateInput, formatResult
+    });
+```
+
+### 5.4 Blindly Trusting AI
+
+**Mô tả:**
+Đây là mistake ngày càng phổ biến khi AI coding assistants trở nên phổ biến. Blindly trusting AI nghĩa là copy-paste code từ AI mà không verify, hiểu, hay test kỹ.
+
+Một số vấn đề khi blindly trusting AI:
+1. AI hallucinate - AI có thể bịa code mà không có thật.
+2. AI không hiểu context - AI không biết business rules, existing architecture, team conventions.
+3. AI code đúng synstax nhưng sai logic - Code chạy được nhưng không làm đúng thứ mình muốn.
+4. AI suggest outdated practices - AI có thể suggest cách cũ, không theo best practices mới.
+
+Đặc biệt với AI, mình cần nhớ: AI code chứa nhiều issues hơn himan code (10.83 với 6.45 issues per PR), và có tới 70% nhiều logic errors hơn.
+
+**Ví dụ sai:**
+
+```
+    ❌ User: "Viết cho tôi function check prime number"
+    AI: viết code
+    User: copy-paste vào production
+
+    Không test, không verify, không hiểu code làm gì
+
+    ❌ User: "Sửa lỗi này giúp tôi" (copy error message)
+    AI: suggest fix
+    User: apply fix, thấy tests pass, done
+
+    Không hiểu tại sao lỗi xảy ra, không biết fix có đúng root cause không
+
+    ❌ User: "Implement authentication cho app"
+    AI: viết đầy đủ code với JWT, bcrypt, etc
+    User: apply toàn bộ code
+
+    Không verify security implications, không check có vulnerabilities không
+```
+
+**Cách tránh:**
+1. Luôn luôn đọc verify AI code trước khi dùng
+ - Đọc code, hiểu code làm gì.
+ - Test kỹ với unit tests.
+ - Check edge cases.
+2. Dùng AI như asistant, không phải replacement
+ - AI giúp viết code nhanh hơn.
+ - Người vẫn phải review và approve.
+ - AI không biết business context của bạn.
+3. Static analysic là bắt buộc
+ - Check ESLint, type checker.
+ - Security scan cho senstive code.
+ - AI code cần extra scrutiny.
+4. Understand before applying
+ - Trước khi apply AI suggestions, hỏi AI giải thích.
+ - Nếu AI không giải thích được = red flag.
+ - verify login với requirements.
+
+ ```typescript
+    // ✅ Good practice: verify trước khi dùng
+    // Khi AI viết code, mình nên:
+    // 1. Đọc và hiểu code
+    // 2. Trace through logic bằng tay
+    // 3. Viết tests để verify
+    // 4. Check edge cases
+    // 5. Review với team nếu cần
+
+    it('AI viết function này đúng không?', () => {
+    // Test với known inputs để verify
+    const result = aiSuggestedFunction(5);
+    expect(result).toBe(120); // 5! = 120
+    
+    // Test edge cases
+    expect(aiSuggestedFunction(0)).toBe(1);
+    expect(aiSuggestedFunction(1)).toBe(1);
+    
+    // Verify với inputs khác
+    expect(aiSuggestedFunction(10)).toBe(3628800);
+    });
+ ```
+---
