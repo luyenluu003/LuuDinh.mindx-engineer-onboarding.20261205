@@ -1053,3 +1053,56 @@ Những erro cases phổ biến cần test:
 ```
 
 ---
+
+## 4. AI Validation Strategy
+
+### 4.1 How Tests Help Verify AI Code
+Khi dùng AI viết code, có một điều mình cần nhớ : AI code thường có nhiều vấn đề hơn code người viết thường xuyên. Cụ thể là theon ghiên cứu, AI code chứa trung bình 10.83 issues per PR, so với 6.45 của code người viết. Và quan trọng hơn, AI code có tới 75% nhiều logic errors hơn.
+
+Tests giúp mình xá minh AI code theo mất cách:
+1. Phát hiện lõi logic sai AI có thể hiểu sai requirements và viết code sai logic. Tests là cách để mình verify xem code có làm đúng thứ mình muốn không. Nếu test pass mà mình nghi ngờ, có thể test chưa đủ cover hết cases.
+2. Tìm edge cases bị bỏ sót Ai thường code cho happy path - tức là chạy đúng khi mọi thứ ideal. Nhưng thực tế thì input có thể là null, empty, giá trị max, giá trị âm... Tests giúp mình cover những trường hợp này.
+3. Verify security AI đôi khi viết code có lỗ hổng bảo mật mà người viết có kinh nghiệm sẽ tránh. Ví dụ như SQL Injection, XSS, Security tests giúp phát hiện những thứ này.
+4. Đảm bảo regression khi mình yêu cầu AI sửa một bug, tests cũ giữ vai trò regression suite - đảm bảo AI không làm hỏng thứ gì khác trong quá trình sửa.
+5. Giúp hiểu code hơn khi viết tests, mình buộc phải đọc kỹ code AI viết. Nhiều khi nhờ vậy mà phát hiện code không hợp lý hoặc không match với requirement.
+
+### 4.2 Guardrails for AI-Generated Code
+
+| #   | Guardrail | Implementation |
+| --- | --------- | -------------- |
+| 1   | Static Analysis trên mọi commit          | Chạy Eslint, SonarQube, hoặc Semgrep tự động. AI code thường có style issues và prtential bugs mà tools này bắt được. Mình nên setup pre-commit hook để không commit code chưa qua scan.               |
+| 2   | Unit tests viết trước khi AI viết implementation          | Áp dụng TDD approach - viết test trước, rồi mới nhờ AI AI generate code để pass test đó. Cách này đảm bảo AI hiểu đúng requirements thay vì tự động nghĩ ra specification riêng.               |
+| 3   | Code review bắt buộc cho business logic           | AI có thể viết code chạy đúng nhưng không đúng bới business rules. Cần người có domain knowledge review phần này trước khi merge. Đặc biệt là các validation rules, calculation logic.                |
+| 4   | Security scanning chuyên sâu          | Dùng SAST tools như Snyk, Checkmarx để scan AI code. AI thường có tỷ lệ security issues cao hơn, đặc biệt là insecure deserialization (2.74x more common), XSS vulnerabilities.               |
+| 5   | Mutation Testing           | Không chỉ đo coverage, mà dùng mutation testing để verify tests thực sự catch được bugs. Line coverage 85-90% cho AI code (so với 70-80% cho human code). Teams dùng mutation testing thấy scores improve từ 70% lên 78%.               |
+| 6   | Architectural Drift Detection
+          |   	
+Verify AI code không vi phạm architecture decisions hiện tại. AI đôi khi suggest cách giải quyết không align với hệ thống. Dùng tools hoặc code review để check.             |
+| 7   |   Dependency Risk Assessment
+        |   AI có thể suggest dùng packages không cần thiết hoặc có known vulnerabilities. Scan dependencies trước khi add vào project.             |
+| 8   |  "Comprehension Debt" Awareness
+         |  Code có thể pass all tests nhưng không ai trong team thực sự hiểu nó làm gì. Đây là production risk nghiêm trọng. Cần đảm bảo có documentation và ít nhất một người trong team hiểu rõ AI-generated code.
+              |
+
+### 4.3 AI Validation Checklist
+Trước khi merge AI-generated code, mình cần check:
+
+```
+□ AI code đã được chạy qua static analysis tool (EsLint, SonarQube) chưa?
+□ Có unit tests cho mọi functions/methods không?
+□ Tests đã cover happy  path và edge cases chưa?
+□ Đã verify logic đúng với requirements chưa?
+□ Business rules được implement đúng chưa?
+□ Security đẫ scan đã pass chưa? (XSS, SQL Injection, authentication)
+□ Dependecies mới có known vulnerbilities không?
+□ Error handling có đầy đủ không? (null checks, exception handling)
+□ AI code có align với existing architecture không?
+□ Có documentation cho logic phức tạp không?
+□ Đã có người hiểu code này trong team chưa?
+□ Code không có "comprehension debt" - tức ai cũng hiểu được?
+□ Performance implications đã được xem xét chưa?
+□ Concurrency issues đã được test chưa?
+□ Regression tests pass với code mới chưa?
+```
+
+---
