@@ -457,3 +457,599 @@ E2E test chạy chậm nhất và tốn resource nhất, nhưng nó cho mình co
 - E2E tests chiếm 10%: Chỉ tập trung vào những critical flows thực sự quan trọng. Nếu có giá nhiều E2E test thì CI/CD sẽ rất lâu và dễ fail không đáng có.
 
 ---
+
+## 3. CLI Testing Examples
+
+### 3.1 Commands Testing
+CLI(Command Line Interface) là cách người dùng tương tác với các ứng dụng qua terminal. Test CLI commands là đảm bảo rằng khi gõ lệnh, chương trình hiểu đúng và trả về két quả như mong đợi.
+
+Điểm khác với unit test thông thường là CLI test thường cầ simulate việc truyền argumants, parge flags, và capture output từ stdout/stderr.
+
+Khi nào cần test CLI:
+- Khi ứng dụng có nhiều commands như app create, app list, app delete.
+- Khi cần xử lý arguments và options khác nhau.
+- Khi muốn verify help messages, erroe messages được in ra đúng.
+- Khi cần test exit codes (0 = thành công, khác 0 = lỗi).
+
+**Ví dụ code:**
+
+```java
+    import org.junit.jupiter.api.Test;
+    import org.junit.jupiter.api.io.TempDir;
+    import java.io.ByteArrayOutputStream;
+    import java.io.PrintStream;
+    import java.nio.file.Path;
+    import static org.junit.jupiter.api.Assertions.*;
+    class CLICommandsTest {
+        @Test
+        void testCreateTicketCommand_success(@TempDir Path tempDir) {
+            // Setup: capture stdout
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            System.setOut(new PrintStream(output));
+            // Execute: chạy command tạo ticket
+            String[] args = {"create", "--title", "Bug login", "--description", "Cannot login"};
+            int exitCode = CLI.main(args);
+            // Verify: exit code phải là 0 (thành công)
+            assertEquals(0, exitCode);
+            // Verify: output phải chứa thông báo tạo thành công
+            assertTrue(output.toString().contains("Ticket created successfully"));
+            assertTrue(output.toString().contains("ID:"));
+        }
+        @Test
+        void testListCommand_withNoTickets() {
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            System.setOut(new PrintStream(output));
+            String[] args = {"list"};
+            int exitCode = CLI.main(args);
+            assertEquals(0, exitCode);
+            assertTrue(output.toString().contains("No tickets found"));
+        }
+        @Test
+        void testHelpCommand_showsUsage() {
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            System.setErr(new PrintStream(output));
+            String[] args = {"--help"};
+            int exitCode = CLI.main(args);
+            assertEquals(0, exitCode);
+            assertTrue(output.toString().contains("Usage:"));
+            assertTrue(output.toString().contains("create"));
+            assertTrue(output.toString().contains("list"));
+            assertTrue(output.toString().contains("delete"));
+        }
+        @Test
+        void testUnknownCommand_returnsError() {
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            System.setErr(new PrintStream(output));
+            String[] args = {"invalid-command"};
+            int exitCode = CLI.main(args);
+            // Exit code khác 0 = lỗi
+            assertNotEquals(0, exitCode);
+            assertTrue(output.toString().contains("Unknown command"));
+            assertTrue(output.toString().contains("Try --help"));
+        }
+        @Test
+        void testDeleteCommand_withConfirmation() {
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            System.setOut(new PrintStream(output));
+            // Tạo ticket trước
+            CLI.main(new String[]{"create", "--title", "Temp ticket"});
+            
+            // Clear output
+            output.reset();
+            // Delete với force flag
+            String[] args = {"delete", "--id", "1", "--force"};
+            int exitCode = CLI.main(args);
+            assertEquals(0, exitCode);
+            assertTrue(output.toString().contains("Ticket deleted"));
+        }
+    }
+```
+
+### 3.2 Validation Testing
+Validation là kiểm tra dữ liệu đầu vào có hợp lệ hay không. Ví dụ:email có đúng fomat không, số điện thoại có đủ chữ số khôngh, required fields có được điền không.
+
+Validation testing là test cái logic kiểm tra này. Nó thường nằm ở boundary cases - những trường hợp edge như input rỗng, input quá dài, input có ký tự đặc biệt.
+
+Những thứ cần validate thường gặp:
+- Emai format.
+- Required fields không được trống.
+- String length limits.
+- Number ranges ( Ví dụ tuổi phải > 0).
+- Date formats.
+- Special characters, SQL injection attempts.
+
+**Ví dụ code:**
+
+```java
+    class ValidationTest {
+
+        @Test
+        void testEmailValidation_validEmails() {
+            Validator validator = new EmailValidator();
+            
+            assertTrue(validator.isValid("minh@example.com"));
+            assertTrue(validator.isValid("user.name@company.co.uk"));
+            assertTrue(validator.isValid("test+filter@gmail.com"));
+        }
+
+        @Test
+        void testEmailValidation_invalidEmails() {
+            Validator validator = new EmailValidator();
+            
+            assertFalse(validator.isValid("")); // empty
+            assertFalse(validator.isValid("notanemail")); // không có @
+            assertFalse(validator.isValid("@example.com")); // không có prefix
+            assertFalse(validator.isValid("user@")); // không có domain
+            assertFalse(validator.isValid("user@.com")); // domain bắt đầu bằng dấu chấm
+            assertFalse(validator.isValid("user name@example.com")); // có space
+        }
+
+        @Test
+        void testTitleValidation_length() {
+            TicketValidator validator = new TicketValidator();
+            
+            // Title không được rỗng
+            ValidationResult result1 = validator.validateTitle("");
+            assertFalse(result1.isValid());
+            assertTrue(result1.getError().contains("Title is required"));
+
+            // Title quá ngắn (< 3 ký tự)
+            ValidationResult result2 = validator.validateTitle("AB");
+            assertFalse(result2.isValid());
+
+            // Title quá dài (> 200 ký tự)
+            String longTitle = "A".repeat(201);
+            ValidationResult result3 = validator.validateTitle(longTitle);
+            assertFalse(result3.isValid());
+            assertTrue(result3.getError().contains("maximum 200 characters"));
+
+            // Title hợp lệ
+            ValidationResult result4 = validator.validateTitle("Bug in login page");
+            assertTrue(result4.isValid());
+        }
+
+        @Test
+        void testTitleValidation_specialCharacters() {
+            TicketValidator validator = new TicketValidator();
+            
+            // Title với special characters nên được accept (thường thì nên)
+            ValidationResult result = validator.validateTitle("Bug: <script>alert('xss')</script>");
+            // Tùy requirement, có thể allow hoặc reject
+            assertNotNull(result);
+        }
+
+        @Test
+        void testTicketCreation_allFieldsValid() {
+            TicketValidator validator = new TicketValidator();
+            
+            TicketInput input = new TicketInput();
+            input.setTitle("Lỗi đăng nhập");
+            input.setDescription("Không thể login vào hệ thống");
+            input.setPriority("high");
+            
+            ValidationResult result = validator.validate(input);
+            
+            assertTrue(result.isValid());
+            assertTrue(result.getErrors().isEmpty());
+        }
+
+        @Test
+        void testTicketCreation_multipleErrors() {
+            TicketValidator validator = new TicketValidator();
+            
+            TicketInput input = new TicketInput();
+            // Set invalid data
+            input.setTitle(""); // rỗng
+            input.setPriority("invalid-priority"); // không hợp lệ
+            
+            ValidationResult result = validator.validate(input);
+            
+            assertFalse(result.isValid());
+            assertTrue(result.getErrors().size() >= 2);
+            // Kiểm tra error messages
+            assertTrue(result.getErrorMessages().stream()
+                .anyMatch(e -> e.contains("Title")));
+            assertTrue(result.getErrorMessages().stream()
+                .anyMatch(e -> e.contains("Priority")));
+        }
+
+        @Test
+        void testPriorityValidation_enumValues() {
+            TicketValidator validator = new TicketValidator();
+            
+            // Valid priorities
+            assertTrue(validator.validatePriority("low").isValid());
+            assertTrue(validator.validatePriority("medium").isValid());
+            assertTrue(validator.validatePriority("high").isValid());
+            
+            // Invalid priorities
+            assertFalse(validator.validatePriority("critical").isValid());
+            assertFalse(validator.validatePriority("urgent").isValid());
+            assertFalse(validator.validatePriority("").isValid());
+            assertFalse(validator.validatePriority("HIGH").isValid()); // case sensitive
+        }
+
+        @Test
+        void testSQLInjectionPrevention() {
+            TicketValidator validator = new TicketValidator();
+            
+            // Test các input có thể là SQL injection
+            String maliciousInput = "'; DROP TABLE tickets; --";
+            ValidationResult result = validator.validateTitle(maliciousInput);
+            
+            // Validator nên accept input nhưng hệ thống phải sanitize khi query
+            assertTrue(result.isValid()); // title được accept
+            // Tuy nhiên khi lưu vào DB phải dùng parameterized queries
+        }
+    }
+```
+
+### 3.3 File Storage Testing
+File storage là phần xử lý đọc/ghi dữ liệu vào file. Test phần này cần đảm bảo:
+- File được tạo đúng vị trí.
+- Data được lưu đúng format.
+- File có thể đọkc lại chính xác.
+- Xử lý đúng khi gặp lỗi (File không tồn tại, không có quyền truy cập, disk full, ...).
+
+Điểm quan trọng là dùng @TempDir của JUnit để tạo temporary diretory cho mỗi test, không ảnh hưởng đến production data.
+
+Những Scenario cần test:
+- Lưu file thành công.
+- Đọc file tồn tại.
+- Đọc file không tồn tại (Phải xử lý lỗi).
+- Overwrite file đã có.
+- Tên file với special characters.
+- Path traversal prevention (bảo mật).
+
+**Ví dụ code:**
+
+```java
+    import org.junit.jupiter.api.Test;
+    import org.junit.jupiter.api.io.TempDir;
+    import java.io.IOException;
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+    import java.util.List;
+    import com.fasterxml.jackson.databind.ObjectMapper;
+    import static org.junit.jupiter.api.Assertions.*;
+
+    class FileStorageTest {
+
+        @TempDir
+        Path tempDir;
+
+        private ObjectMapper mapper = new ObjectMapper();
+
+        @Test
+        void testSaveTicket_toFile() throws IOException {
+            // Setup
+            FileStorage storage = new FileStorage(tempDir);
+            Ticket ticket = new Ticket("1", "Bug login", "Cannot login", "open");
+            
+            // Execute
+            Path savedPath = storage.saveTicket(ticket);
+            
+            // Verify
+            assertTrue(Files.exists(savedPath));
+            assertTrue(savedPath.getFileName().toString().startsWith("ticket_"));
+            assertTrue(savedPath.getFileName().toString().endsWith(".json"));
+        }
+
+        @Test
+        void testReadTicket_fromFile() throws IOException {
+            // Setup: tạo file trước
+            Ticket ticket = new Ticket("1", "Bug login", "Cannot login", "open");
+            Path filePath = tempDir.resolve("ticket_1.json");
+            mapper.writeValue(filePath.toFile(), ticket);
+            
+            FileStorage storage = new FileStorage(tempDir);
+            
+            // Execute
+            Ticket readTicket = storage.readTicket("1");
+            
+            // Verify
+            assertEquals("Bug login", readTicket.getTitle());
+            assertEquals("Cannot login", readTicket.getDescription());
+            assertEquals("open", readTicket.getStatus());
+        }
+
+        @Test
+        void testReadTicket_notFound() {
+            FileStorage storage = new FileStorage(tempDir);
+            
+            // Execute & Verify
+            assertThrows(FileNotFoundException.class, () -> {
+                storage.readTicket("nonexistent");
+            });
+        }
+
+        @Test
+        void testDeleteTicket() throws IOException {
+            // Setup: tạo file trước
+            Ticket ticket = new Ticket("1", "Temp ticket", "Will be deleted", "open");
+            Path filePath = tempDir.resolve("ticket_1.json");
+            mapper.writeValue(filePath.toFile(), ticket);
+            
+            FileStorage storage = new FileStorage(tempDir);
+            
+            // Execute
+            storage.deleteTicket("1");
+            
+            // Verify
+            assertFalse(Files.exists(filePath));
+        }
+
+        @Test
+        void testListAllTickets() throws IOException {
+            // Setup: tạo nhiều tickets
+            FileStorage storage = new FileStorage(tempDir);
+            
+            storage.saveTicket(new Ticket("1", "Bug 1", "Desc 1", "open"));
+            storage.saveTicket(new Ticket("2", "Bug 2", "Desc 2", "closed"));
+            storage.saveTicket(new Ticket("3", "Bug 3", "Desc 3", "open"));
+            
+            // Execute
+            List<Ticket> tickets = storage.listAllTickets();
+            
+            // Verify
+            assertEquals(3, tickets.size());
+        }
+
+        @Test
+        void testSaveTicket_withSpecialCharactersInTitle() throws IOException {
+            FileStorage storage = new FileStorage(tempDir);
+            
+            // Title với emoji, tiếng Việt, special chars
+            Ticket ticket = new Ticket("1", "Bug 🚀 Tiếng Việt:café", "Desc <script>", "open");
+            
+            Path savedPath = storage.saveTicket(ticket);
+            Ticket readTicket = storage.readTicket("1");
+            
+            assertEquals("Bug 🚀 Tiếng Việt:café", readTicket.getTitle());
+        }
+
+        @Test
+        void testSaveTicket_pathTraversalPrevention() {
+            FileStorage storage = new FileStorage(tempDir);
+            
+            // Attempt path traversal attack
+            Ticket maliciousTicket = new Ticket();
+            maliciousTicket.setId("../../../etc/passwd");
+            maliciousTicket.setTitle("Hacked!");
+            
+            // Nên throw exception hoặc sanitize
+            assertThrows(InvalidFileNameException.class, () -> {
+                storage.saveTicket(maliciousTicket);
+            });
+        }
+
+        @Test
+        void testBackupAndRestore() throws IOException {
+            FileStorage storage = new FileStorage(tempDir);
+            
+            // Create original ticket
+            Ticket ticket = new Ticket("1", "Original", "Desc", "open");
+            storage.saveTicket(ticket);
+            
+            // Backup
+            Path backupPath = storage.backup("1");
+            assertTrue(Files.exists(backupPath));
+            
+            // Modify original
+            Ticket modified = new Ticket("1", "Modified", "New desc", "closed");
+            storage.saveTicket(modified);
+            
+            // Restore from backup
+            storage.restoreFromBackup("1", backupPath);
+            Ticket restored = storage.readTicket("1");
+            
+            assertEquals("Original", restored.getTitle());
+        }
+    }
+```
+
+### 3.4 Error Handling Testing
+Erroe handling là phần quan trọng nhưng hay bị bỏ qua nhất. Test error handling đảm bảo ứng dụng không crash khi gặp lỗi, mà thay vào đó là thông báo rõ ràng cho người dùng.
+
+Một số nguyên tắc test error handling:
+1. Test happy path trước - đảm bảo case hoạt động bình thường.
+2. Test edge cases - input rỗng, null, giá trị max/min.
+3. Test exception cases - network failure, disk full, timeout.
+4. Verify error messages - phải hữu ích, không lộ thông tin nhạy cảm.
+5. Verify graceful degradation - ứng dụng không crash.
+
+Những erro cases phổ biến cần test:
+- Input null hoặc underfined.
+- Network timout/disconnect.
+- Database connection failure.
+- File permission denied.
+- Disk full.
+- Invalid JSON format.
+- Concurrent access conflicts.
+- Memory exhaustion.
+
+**Ví dụ code:**
+
+```java
+    class ErrorHandlingTest {
+
+        @Test
+        void testNetworkFailure_gracefulDegradation() {
+            NetworkClient client = new NetworkClient();
+            
+            // Mock network failure
+            when(httpClient.execute(any())).thenThrow(new ConnectException("Connection refused"));
+            
+            // Execute
+            Result result = client.fetchData("https://api.example.com/data");
+            
+            // Verify: không throw exception, trả về error result
+            assertFalse(result.isSuccess());
+            assertEquals("NETWORK_ERROR", result.getErrorCode());
+            assertTrue(result.getMessage().contains("Unable to connect"));
+            
+            // Verify: không lộ sensitive info
+            assertFalse(result.getMessage().contains("Connection refused"));
+        }
+
+        @Test
+        void testDatabaseFailure_doesNotCrash() {
+            DatabaseService db = new DatabaseService();
+            
+            // Setup: mock DB connection failure
+            when(connection.connect()).thenThrow(new SQLException("Connection refused"));
+            
+            // Execute & Verify
+            assertDoesNotThrow(() -> {
+                Result result = db.query("SELECT * FROM users");
+                assertFalse(result.isSuccess());
+                assertEquals("DB_CONNECTION_FAILED", result.getErrorCode());
+            });
+        }
+
+        @Test
+        void testNullPointerException_prevention() {
+            TicketService service = new TicketService();
+            
+            // Test với null input
+            Result result = service.createTicket(null);
+            
+            assertFalse(result.isSuccess());
+            assertEquals("INVALID_INPUT", result.getErrorCode());
+            assertTrue(result.getMessage().contains("Ticket data is required"));
+        }
+
+        @Test
+        void testFileNotFound_returnsUserFriendlyMessage() {
+            FileStorage storage = new FileStorage(Paths.get("/tmp"));
+            
+            Result result = storage.loadTicket("nonexistent-id");
+            
+            assertFalse(result.isSuccess());
+            assertEquals("FILE_NOT_FOUND", result.getErrorCode());
+            // Message phải hữu ích cho user
+            assertTrue(result.getMessage().contains("Ticket not found"));
+            assertTrue(result.getMessage().contains("nonexistent-id"));
+        }
+
+        @Test
+        void testDiskFull_errorHandling() {
+            FileStorage storage = new FileStorage(Paths.get("/full-disk"));
+            
+            // Mock disk full
+            when(fileWriter.write(any())).thenThrow(new IOException("No space left on device"));
+            
+            Ticket ticket = new Ticket("1", "Test", "Desc", "open");
+            Result result = storage.saveTicket(ticket);
+            
+            assertFalse(result.isSuccess());
+            assertEquals("STORAGE_FULL", result.getErrorCode());
+            // Message phải gợi ý giải pháp
+            assertTrue(result.getMessage().toLowerCase().contains("disk") || 
+                    result.getMessage().toLowerCase().contains("space"));
+        }
+
+        @Test
+        void testInvalidJSON_returnsParseError() {
+            String invalidJson = "{ invalid json content }";
+            
+            Result result = JSONParser.parse(invalidJson);
+            
+            assertFalse(result.isSuccess());
+            assertEquals("PARSE_ERROR", result.getErrorCode());
+            // Nên include line/column number nếu có thể
+            assertTrue(result.getMessage().contains("JSON"));
+        }
+
+        @Test
+        void testConcurrentModification_handled() {
+            TicketService service = new TicketService();
+            Ticket ticket = service.createTicket("Test", "Desc");
+            
+            // Giả lập concurrent modification
+            // Thread 1 đọc ticket
+            Ticket t1 = service.getTicket(ticket.getId());
+            // Thread 2 sửa ticket
+            service.updateTicket(ticket.getId(), "Updated by T2");
+            // Thread 1 cố ghi lại
+            Result result = service.updateTicket(ticket.getId(), "Updated by T1", t1.getVersion());
+            
+            // Nên detect conflict
+            assertFalse(result.isSuccess());
+            assertEquals("CONFLICT_DETECTED", result.getErrorCode());
+            assertTrue(result.getMessage().contains("conflict") || 
+                    result.getMessage().contains("modified"));
+        }
+
+        @Test
+        void testTimeout_returnsTimeoutError() {
+            NetworkClient client = new NetworkClient();
+            client.setTimeout(100); // 100ms
+            
+            // Mock slow response
+            when(httpClient.execute(any())).thenAnswer(invocation -> {
+                Thread.sleep(200);
+                return new Response("data");
+            });
+            
+            Result result = client.fetchData("https://slow-api.example.com");
+            
+            assertFalse(result.isSuccess());
+            assertEquals("TIMEOUT", result.getErrorCode());
+            assertTrue(result.getMessage().toLowerCase().contains("timeout"));
+        }
+
+        @Test
+        void testValidationError_aggregatesAllErrors() {
+            TicketValidator validator = new TicketValidator();
+            
+            TicketInput input = new TicketInput();
+            input.setTitle(""); // rỗng
+            input.setPriority("invalid");
+            input.setAssigneeEmail("not-an-email");
+            
+            ValidationResult result = validator.validate(input);
+            
+            assertFalse(result.isValid());
+            // Nên collect tất cả errors, không chỉ error đầu tiên
+            assertTrue(result.getErrorMessages().size() >= 3);
+        }
+
+        @Test
+        void testStackTrace_notExposedToUser() {
+            try {
+                service.processData("trigger error");
+            } catch (Exception e) {
+                Result result = ErrorHandler.handle(e);
+                
+                // Verify: user-facing message không chứa stack trace
+                assertFalse(result.getMessage().contains("at com.company"));
+                assertFalse(result.getMessage().contains("java.lang.NullPointerException"));
+                assertFalse(result.getMessage().contains("at line"));
+                
+                // Stack trace chỉ nên log ở phía server
+                verify(logger).error(eq("Processing failed"), eq(e));
+            }
+        }
+
+        @Test
+        void testRecovery_mechanism() {
+            NetworkClient client = new NetworkClient();
+            client.setMaxRetries(3);
+            
+            // Mock: fail 2 lần, success lần 3
+            when(httpClient.execute(any()))
+                .thenThrow(new ConnectException("Fail 1"))
+                .thenThrow(new ConnectException("Fail 2"))
+                .thenReturn(new Response("Success"));
+            
+            Result result = client.fetchWithRetry("https://unstable-api.com");
+            
+            assertTrue(result.isSuccess());
+            assertEquals("Success", result.getData());
+            verify(httpClient, times(3)).execute(any());
+        }
+    }
+```
+
+---
