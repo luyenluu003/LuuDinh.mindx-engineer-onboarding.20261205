@@ -151,6 +151,7 @@ async function main(): Promise<void> {
         await UpdateCommand(id, {
           status: options.status as string | undefined,
           priority: options.priority as string | undefined,
+          description: options.description as string | undefined,
         });
         break;
       }
