@@ -1,0 +1,112 @@
+[
+  {
+    "title": "Sửa lỗi hết hạn token đăng nhập",
+    "description": "Người dùng bị đăng xuất bất ngờ sau 30 phút khi đang sử dụng ứng dụng. Token JWT nên được tự động làm mới hoặc kéo dài phiên đăng nhập.",
+    "status": "in_progress",
+    "priority": "high",
+    "tags": ["bug", "auth", "frontend"],
+    "id": "be267e1d-3e49-45c3-972d-c77c24d89eeb",
+    "createdAt": "2026-05-20T09:15:00.000Z",
+    "updatedAt": "2026-05-23T07:18:49.807Z"
+  },
+  {
+    "title": "Thêm tính năng chuyển chế độ tối",
+    "description": "Thêm công tắc trong cài đặt người dùng để bật/tắt chế độ tối. Nên lưu trữ sở thích người dùng trong local storage và ưu tiên theo cài đặt hệ thống.",
+    "status": "open",
+    "priority": "medium",
+    "tags": ["feature", "ui", "settings"],
+    "id": "d1a77224-6921-408d-b1e7-f9fc56cd45cf",
+    "createdAt": "2026-05-18T14:30:00.000Z",
+    "updatedAt": "2026-05-23T07:18:51.061Z"
+  },
+  {
+    "title": "Migration database cho bảng user preferences",
+    "description": "Tạo script migration để thêm bảng user_preferences với các cột theme, language, notification_settings và timezone.",
+    "status": "resolved",
+    "priority": "high",
+    "tags": ["database", "backend", "migration"],
+    "id": "e87f71f7-0fc6-440f-a78c-536ddd1d7ab0",
+    "createdAt": "2026-05-15T10:00:00.000Z",
+    "updatedAt": "2026-05-22T16:45:00.000Z"
+  },
+  {
+    "title": "Thêm tính năng xuất ra file CSV",
+    "description": "Người dùng cần có khả năng xuất dữ liệu ra định dạng CSV từ trang báo cáo. Bao gồm tất cả các cột hiển thị và tôn trọng bộ lọc hiện tại.",
+    "status": "open",
+    "priority": "medium",
+    "tags": ["feature", "reports", "export"],
+    "id": "8f71db0e-7ac5-4c7b-b258-593edb9590d0",
+    "createdAt": "2026-05-19T11:20:00.000Z",
+    "updatedAt": "2026-05-23T07:18:55.718Z"
+  },
+  {
+    "title": "Sửa rò rỉ bộ nhớ trong biểu đồ dashboard",
+    "description": "Dashboard trở nên không phản hồi sau khi xem nhiều tab biểu đồ. Việc sử dụng bộ nhớ tăng liên tục và cuối cùng tab trình duyệt bị treo.",
+    "status": "open",
+    "priority": "critical",
+    "tags": ["bug", "performance", "dashboard"],
+    "id": "ab6dc6e1-3681-420b-9409-09b609ed85c8",
+    "createdAt": "2026-05-21T08:00:00.000Z",
+    "updatedAt": "2026-05-23T07:18:57.647Z"
+  },
+  {
+    "title": "Tích hợp thông báo Slack",
+    "description": "Gửi thông báo đến kênh Slack đã cấu hình khi ticket quan trọng được tạo hoặc được giao. Bao gồm chi tiết ticket và liên kết trực tiếp.",
+    "status": "closed",
+    "priority": "medium",
+    "tags": ["feature", "integrations", "notifications"],
+    "id": "9da268e5-c989-4a4e-9483-0ee71ac39477",
+    "createdAt": "2026-05-10T13:00:00.000Z",
+    "updatedAt": "2026-05-20T17:30:00.000Z"
+  },
+  {
+    "title": "Cập nhật tài liệu API",
+    "description": "Tài liệu API đã lỗi thời. Cần ghi lại các endpoint mới cho user preferences và cập nhật ví dụ về luồng xác thực.",
+    "status": "in_progress",
+    "priority": "low",
+    "tags": ["documentation", "api"],
+    "id": "04876805-0f69-4b4f-9558-aaf78ffab49d",
+    "createdAt": "2026-05-17T15:45:00.000Z",
+    "updatedAt": "2026-05-23T07:19:00.371Z"
+  },
+  {
+    "title": "Thêm rate limiting cho API endpoints",
+    "description": "Thêm rate limiting để ngăn chặn việc lạm dụng API công khai. 100 request mỗi phút cho người dùng đã xác thực, 20 cho người dùng ẩn danh.",
+    "status": "closed",
+    "priority": "high",
+    "tags": ["security", "api", "backend"],
+    "id": "2290cbf3-087e-4cb7-8848-6a4d2853fef6",
+    "createdAt": "2026-05-12T09:30:00.000Z",
+    "updatedAt": "2026-05-23T07:19:03.188Z"
+  },
+  {
+    "title": "Sửa lỗi hiển thị email template trên Outlook",
+    "description": "Email template bị hiển thị lỗi trên ứng dụng Outlook desktop. Văn bản bị chồng lên nhau và các nút bị lệch. Hoạt động tốt trên Gmail.",
+    "status": "open",
+    "priority": "high",
+    "tags": ["bug", "email", "frontend"],
+    "id": "99b0ee31-9506-46f7-934b-a03a3792b913",
+    "createdAt": "2026-05-22T10:15:00.000Z",
+    "updatedAt": "2026-05-23T07:19:05.080Z"
+  },
+  {
+    "title": "Viết unit test cho payment service",
+    "description": "Payment service có 0% độ phủ test. Viết unit tests cho tất cả các hàm xử lý thanh toán bao gồm logic hoàn tiền.",
+    "status": "open",
+    "priority": "medium",
+    "tags": ["testing", "backend", "payments"],
+    "id": "74b7ba1e-281f-41fe-8c52-3780fdf8f6c6",
+    "createdAt": "2026-05-16T14:00:00.000Z",
+    "updatedAt": "2026-05-23T07:19:08.048Z"
+  },
+  {
+    "title": "Tối ưu hiệu suất tải lên hình ảnh",
+    "description": "Việc tải lên hình ảnh lớn mất quá nhiều thời gian. Thực hiện nén phía client và tải lên theo chunks cho các file lớn hơn 5MB.",
+    "status": "open",
+    "priority": "medium",
+    "tags": ["feature", "performance", "uploads"],
+    "id": "79ac0288-6050-42e9-8f58-1c690f75b391",
+    "createdAt": "2026-05-14T11:00:00.000Z",
+    "updatedAt": "2026-05-23T07:19:09.856Z"
+  }
+]
