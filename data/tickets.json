@@ -1,7 +1,7 @@
 [
   {
     "title": "Sửa lỗi hết hạn token đăng nhập",
-    "description": "Người dùng bị đăng xuất bất ngờ sau 30 phút khi đang sử dụng ứng dụng. Token JWT nên được tự động làm mới hoặc kéo dài phiên đăng nhập.",
+    "description": "a",
     "status": "in_progress",
     "priority": "high",
     "tags": [
@@ -11,7 +11,7 @@
     ],
     "id": "be267e1d-3e49-45c3-972d-c77c24d89eeb",
     "createdAt": "2026-05-20T09:15:00.000Z",
-    "updatedAt": "2026-05-23T07:18:49.807Z"
+    "updatedAt": "2026-05-23T08:43:22.183Z"
   },
   {
     "title": "Thêm tính năng chuyển chế độ tối",
@@ -158,10 +158,106 @@
     "status": "open",
     "priority": "high",
     "tags": [
-      "bug auth"
+      "bug bug"
     ],
-    "id": "337d40d6-b146-4f81-b85f-c6afdcb91201",
-    "createdAt": "2026-05-23T07:53:32.153Z",
-    "updatedAt": "2026-05-23T07:53:32.153Z"
+    "id": "f3dcbb31-9999-42be-bf3f-9daac3df4544",
+    "createdAt": "2026-05-23T08:17:19.281Z",
+    "updatedAt": "2026-05-23T08:17:19.281Z"
+  },
+  {
+    "title": "Test tags",
+    "description": "",
+    "status": "open",
+    "priority": "medium",
+    "tags": [
+      "bug bug feature"
+    ],
+    "id": "bc2d613b-6791-4d9a-9c2f-2de7644889b0",
+    "createdAt": "2026-05-23T08:18:38.996Z",
+    "updatedAt": "2026-05-23T08:18:38.996Z"
+  },
+  {
+    "title": "Test tags",
+    "description": "",
+    "status": "open",
+    "priority": "medium",
+    "tags": [
+      "bug bug feature"
+    ],
+    "id": "0743d6b3-f51f-4fae-ba42-a2fe6621fd76",
+    "createdAt": "2026-05-23T08:19:32.728Z",
+    "updatedAt": "2026-05-23T08:19:32.728Z"
+  },
+  {
+    "title": "Test unique tags",
+    "description": "",
+    "status": "open",
+    "priority": "medium",
+    "tags": [
+      "bug bug feature"
+    ],
+    "id": "77089344-7a70-4bc0-bfb2-946fad2c846d",
+    "createdAt": "2026-05-23T08:21:30.824Z",
+    "updatedAt": "2026-05-23T08:21:30.824Z"
+  },
+  {
+    "title": "Test unique tags v2",
+    "description": "",
+    "status": "open",
+    "priority": "medium",
+    "tags": [
+      "bug bug feature"
+    ],
+    "id": "9910d0d5-73b1-4d5d-9d6b-660040c561a5",
+    "createdAt": "2026-05-23T08:21:55.643Z",
+    "updatedAt": "2026-05-23T08:21:55.643Z"
+  },
+  {
+    "title": "Sửa lỗi đăng nhập",
+    "description": "Người dùng bị đăng xuất",
+    "status": "open",
+    "priority": "high",
+    "tags": [
+      "bug bug"
+    ],
+    "id": "6578c885-1e19-40fb-888f-54511690e131",
+    "createdAt": "2026-05-23T08:24:19.632Z",
+    "updatedAt": "2026-05-23T08:24:19.632Z"
+  },
+  {
+    "title": "Test tags unique",
+    "description": "Test case",
+    "status": "open",
+    "priority": "medium",
+    "tags": [
+      "bug"
+    ],
+    "id": "790a9b51-5cab-4c06-ba2f-8e611937b4e4",
+    "createdAt": "2026-05-23T08:28:51.210Z",
+    "updatedAt": "2026-05-23T08:28:51.210Z"
+  },
+  {
+    "title": "Test tags space",
+    "description": "Test",
+    "status": "open",
+    "priority": "medium",
+    "tags": [
+      "bug"
+    ],
+    "id": "f55c0aec-f764-4b0a-a8b5-afc880564919",
+    "createdAt": "2026-05-23T08:28:59.462Z",
+    "updatedAt": "2026-05-23T08:28:59.462Z"
+  },
+  {
+    "title": "Sửa lỗi đăng nhập",
+    "description": "Người dùng bị đăng xuất",
+    "status": "open",
+    "priority": "high",
+    "tags": [
+      "bug"
+    ],
+    "id": "24122bd1-fc43-4f0e-b2de-409fcbb6666b",
+    "createdAt": "2026-05-23T08:29:47.298Z",
+    "updatedAt": "2026-05-23T08:29:47.298Z"
   }
 ]

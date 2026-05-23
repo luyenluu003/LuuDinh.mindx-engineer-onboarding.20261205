@@ -1,12 +1,23 @@
 import { TicketService } from '../services/ticket.service.js';
 
+function isValidUUID(id: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(id);
+}
+
 export async function ShowCommand(id: string): Promise<void> {
+  const trimmedId = id.trim();
+  if (!trimmedId || !isValidUUID(trimmedId)) {
+    console.error(`Error: Invalid ticket ID format "${id}". Expected a valid UUID.`);
+    return;
+  }
+
   const service = new TicketService();
 
-  const ticket = await service.findById(id);
+  const ticket = await service.findById(trimmedId);
 
   if (!ticket) {
-    console.error(`Error: Ticket with ID "${id}" not found.`);
+    console.error(`Error: Ticket with ID "${trimmedId}" not found.`);
     return;
   }
 

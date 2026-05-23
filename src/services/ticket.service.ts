@@ -28,7 +28,36 @@ export class TicketService {
   }
 
   async create(input: CreateTicketInput): Promise<Ticket> {
-    const validated = createTicketSchema.parse(input);
+    if (!input.title || input.title.trim() === '') {
+      throw new Error('Title is required');
+    }
+
+    if (input.title.trim().length > 200) {
+      throw new Error('Title must be at most 200 characters');
+    }
+
+    if (input.description && input.description.length > 2000) {
+      throw new Error('Description must be at most 2000 characters');
+    }
+
+    let normalizedTags = input.tags || [];
+    normalizedTags = normalizedTags
+      .map((tag) => tag.trim())
+      .filter((tag) => tag.length > 0);
+
+    if (normalizedTags.length > 20) {
+      throw new Error('Maximum 20 tags allowed');
+    }
+
+    const uniqueTags = [...new Set(normalizedTags)];
+
+    const validated = createTicketSchema.parse({
+      title: input.title.trim(),
+      description: input.description?.trim() || '',
+      priority: input.priority,
+      status: input.status,
+      tags: uniqueTags,
+    });
 
     const now = new Date().toISOString();
     const ticket: Ticket = {
@@ -87,14 +116,35 @@ export class TicketService {
       throw new Error('Ticket not found');
     }
 
-    const updatedFields: Partial<Ticket> = { ...input };
+    if (input.title !== undefined && input.title.trim() === '') {
+      throw new Error('Title cannot be empty');
+    }
+
+    if (input.title && input.title.trim().length > 200) {
+      throw new Error('Title must be at most 200 characters');
+    }
+
+    if (input.description && input.description.length > 2000) {
+      throw new Error('Description must be at most 2000 characters');
+    }
+
+    let normalizedTags = input.tags || [];
+    normalizedTags = normalizedTags
+      .map((tag) => tag.trim())
+      .filter((tag) => tag.length > 0);
+
+    if (normalizedTags.length > 20) {
+      throw new Error('Maximum 20 tags allowed');
+    }
+
+    const uniqueTags = [...new Set(normalizedTags)];
 
     const validated = createTicketSchema.parse({
-      title: updatedFields.title ?? existingTicket.title,
-      description: updatedFields.description ?? existingTicket.description,
-      status: updatedFields.status ?? existingTicket.status,
-      priority: updatedFields.priority ?? existingTicket.priority,
-      tags: updatedFields.tags ?? existingTicket.tags,
+      title: input.title?.trim() ?? existingTicket.title,
+      description: input.description?.trim() ?? existingTicket.description,
+      status: input.status ?? existingTicket.status,
+      priority: input.priority ?? existingTicket.priority,
+      tags: uniqueTags.length > 0 ? uniqueTags : existingTicket.tags,
     });
 
     const finalTicket: Ticket = {

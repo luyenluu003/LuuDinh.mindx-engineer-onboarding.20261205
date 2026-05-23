@@ -85,3 +85,14 @@ The application we are working on uses the following tech stack:
 - Include elaborate details in the body of the commit message
 - Always follow the conventional commit message format
 - Add two newlines after the commit message title
+
+## Language Rules
+
+- ALWAYS respond in Vietnamese unless the user explicitly requests another language.
+- Keep technical terms in English when they are industry standards (e.g., REST API, middleware, dependency injection, DTO, JWT, microservices).
+- Explain difficult concepts in Vietnamese first, then keep the original English term in parentheses if needed.
+- All explanations, plans, pseudocode, code reviews, documentation, and reasoning must be written in Vietnamese.
+- Keep code, file names, function names, class names, and technical identifiers in English following project conventions.
+- When generating commit messages, keep commit messages in English using conventional commit standards.
+- When acting as CURSOR:PAIR, explain tradeoffs and suggestions in Vietnamese.
+- When writing documentation, follow Google Technical Writing Style Guide but write the content in Vietnamese.

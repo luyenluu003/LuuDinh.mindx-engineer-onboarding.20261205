@@ -11,7 +11,11 @@ export async function ListCommand(args?: {
   const filters: TicketFilters = {};
 
   if (args?.status) {
-    const status = args.status.toLowerCase();
+    const status = args.status.trim().toLowerCase();
+    if (status === '' || status === 'true') {
+      console.error('Error: Status filter cannot be empty.');
+      return;
+    }
     if (!Object.values(TicketStatus).includes(status as TicketStatus)) {
       throw new Error(`Invalid status: ${args.status}`);
     }
@@ -19,7 +23,11 @@ export async function ListCommand(args?: {
   }
 
   if (args?.priority) {
-    const priority = args.priority.toLowerCase();
+    const priority = args.priority.trim().toLowerCase();
+    if (priority === '' || priority === 'true') {
+      console.error('Error: Priority filter cannot be empty.');
+      return;
+    }
     if (!Object.values(TicketPriority).includes(priority as TicketPriority)) {
       throw new Error(`Invalid priority: ${args.priority}`);
     }
@@ -27,7 +35,12 @@ export async function ListCommand(args?: {
   }
 
   if (args?.tag) {
-    filters.tag = args.tag;
+    const tag = args.tag.trim();
+    if (tag === '' || tag === 'true') {
+      console.error('Error: Tag filter cannot be empty.');
+      return;
+    }
+    filters.tag = tag;
   }
 
   const tickets = await service.findAll(filters);

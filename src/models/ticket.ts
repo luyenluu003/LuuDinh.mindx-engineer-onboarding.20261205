@@ -21,11 +21,18 @@ const createTicketSchemaInternal = z.object({
   title: z
     .string()
     .min(1, 'Title is required')
+    .max(200, 'Title must be at most 200 characters')
     .transform((val) => val.trim()),
-  description: z.string().default(''),
+  description: z
+    .string()
+    .max(2000, 'Description must be at most 2000 characters')
+    .default(''),
   status: z.enum(statusValues).default(TicketStatus.OPEN),
   priority: z.enum(priorityValues).default(TicketPriority.MEDIUM),
-  tags: z.array(z.string()).default([]),
+  tags: z
+    .array(z.string().min(1, 'Tag cannot be empty').max(50, 'Tag must be at most 50 characters'))
+    .max(20, 'Maximum 20 tags allowed')
+    .default([]),
 });
 
 export const createTicketSchema = createTicketSchemaInternal;
