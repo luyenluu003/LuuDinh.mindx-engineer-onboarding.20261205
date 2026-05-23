@@ -2,6 +2,8 @@
 
 Công cụ CLI để quản lý ticket, lưu trữ dữ liệu cục bộ dưới dạng file JSON. Được xây dựng với TypeScript và phương pháp TDD (Test-Driven Development).
 
+> **Lưu ý:** Câu lệnh trong README này được viết cho **Windows PowerShell**. Nếu dùng Linux/macOS, bạn có thể bỏ qua các lưu ý về PowerShell.
+
 ## Tính năng
 
 - Tạo ticket với tiêu đề, mô tả, trạng thái, mức độ ưu tiên và nhãn
@@ -14,31 +16,32 @@ Công cụ CLI để quản lý ticket, lưu trữ dữ liệu cục bộ dướ
 
 - Node.js phiên bản 18 trở lên
 - npm hoặc yarn package manager
+- Windows PowerShell / Command Prompt / Linux/macOS Terminal
 
 ## Cài đặt
 
 1. Clone repository:
 
-```bash
+```powershell
 git clone <repository-url>
 cd ticket-manager-cli
 ```
 
 2. Cài đặt các dependency:
 
-```bash
+```powershell
 npm install
 ```
 
 3. Build project:
 
-```bash
+```powershell
 npm run build
 ```
 
 4. Liên kết CLI (tùy chọn, dùng toàn cục):
 
-```bash
+```powershell
 npm link
 ```
 
@@ -46,56 +49,61 @@ npm link
 
 ### Tạo Ticket
 
-```bash
-# Ticket cơ bản
-npm run dev -- create --title "Sửa lỗi đăng nhập"
+> **PowerShell:** Dùng `npx tsx` trực tiếp hoặc thêm `--` trước các options
+
+```powershell
+# Cách 1: Dùng npx tsx trực tiếp (khuyến nghị)
+npx tsx src/index.ts create --title "Sửa lỗi đăng nhập"
+
+# Cách 2: Dùng npm run dev
+npm run dev -- "create" "--title=Sửa lỗi đăng nhập"
 
 # Ticket đầy đủ các tùy chọn
-npm run dev -- create --title "Sửa lỗi đăng nhập" --description "Người dùng không thể đăng nhập" --priority high --tags bug,urgent
+npx tsx src/index.ts create --title "Sửa lỗi đăng nhập" --description "Người dùng không thể đăng nhập" --priority high --tags bug,urgent
 ```
 
 ### Liệt kê Tickets
 
-```bash
+```powershell
 # Liệt kê tất cả tickets
-npm run dev -- list
+npx tsx src/index.ts list
 
 # Lọc theo trạng thái
-npm run dev -- list --status open
+npx tsx src/index.ts list --status open
 
 # Lọc theo mức độ ưu tiên
-npm run dev -- list --priority high
+npx tsx src/index.ts list --priority high
 
 # Lọc theo nhãn
-npm run dev -- list --tag bug
+npx tsx src/index.ts list --tag bug
 
 # Kết hợp nhiều bộ lọc
-npm run dev -- list --status open --priority high
+npx tsx src/index.ts list --status open --priority high
 ```
 
 ### Xem chi tiết Ticket
 
-```bash
-npm run dev -- show <ticket-id>
+```powershell
+npx tsx src/index.ts show <ticket-id>
 ```
 
 ### Cập nhật Ticket
 
-```bash
+```powershell
 # Cập nhật trạng thái
-npm run dev -- update <ticket-id> --status closed
+npx tsx src/index.ts update <ticket-id> --status closed
 
 # Cập nhật mức độ ưu tiên
-npm run dev -- update <ticket-id> --priority critical
+npx tsx src/index.ts update <ticket-id> --priority critical
 
 # Cập nhật cả hai
-npm run dev -- update <ticket-id> --status resolved --priority low
+npx tsx src/index.ts update <ticket-id> --status resolved --priority low
 ```
 
 ### Xem trợ giúp
 
-```bash
-npm run dev -- --help
+```powershell
+npx tsx src/index.ts --help
 ```
 
 ## Các tùy chọn
@@ -131,7 +139,7 @@ Tickets được lưu trữ trong file JSON tại `./data/tickets.json` (có th�
 
 ## Chạy Tests
 
-```bash
+```powershell
 # Chạy tất cả tests
 npm test
 
@@ -175,16 +183,16 @@ tests/
 
 ### Build
 
-```bash
+```powershell
 npm run build
 ```
 
 ### Kiểm tra lỗi code (Lint)
 
-```bash
+```powershell
 npm run lint
 ```
 
 ## Giấy phép
 
-MIT
+LUYEN LUU
