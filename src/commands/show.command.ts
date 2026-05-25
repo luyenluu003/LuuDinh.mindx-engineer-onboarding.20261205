@@ -1,9 +1,5 @@
 import { TicketService } from '../services/ticket.service.js';
-
-function isValidUUID(id: string): boolean {
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-  return uuidRegex.test(id);
-}
+import { isValidUUID, handleError } from '../utils/validation.js';
 
 export async function ShowCommand(id: string): Promise<void> {
   const trimmedId = id.trim();
@@ -31,10 +27,6 @@ export async function ShowCommand(id: string): Promise<void> {
     console.log(`  Created: ${new Date(ticket.createdAt).toLocaleString()}`);
     console.log(`  Updated: ${new Date(ticket.updatedAt).toLocaleString()}`);
   } catch (error) {
-    if (error instanceof Error) {
-      console.error(`Error: ${error.message}`);
-    } else {
-      console.error('Error: An unexpected error occurred while fetching the ticket.');
-    }
+    handleError(error, 'fetching ticket');
   }
 }

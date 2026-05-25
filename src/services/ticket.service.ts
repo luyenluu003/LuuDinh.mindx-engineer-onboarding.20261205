@@ -2,6 +2,7 @@ import { randomUUID } from 'crypto';
 import { createTicketSchema, Ticket, TicketStatus, TicketPriority, CreateTicketInput } from '../models/ticket.js';
 import { JsonStorageService } from '../storage/json-storage.service.js';
 import { DEFAULT_CONFIG } from '../types/config.js';
+import { MAX_TITLE_LENGTH, MAX_DESCRIPTION_LENGTH, MAX_TAGS } from '../utils/validation.js';
 
 export interface TicketFilters {
   status?: TicketStatus;
@@ -32,12 +33,12 @@ export class TicketService {
       throw new Error('Title is required');
     }
 
-    if (input.title.trim().length > 200) {
-      throw new Error('Title must be at most 200 characters');
+    if (input.title.trim().length > MAX_TITLE_LENGTH) {
+      throw new Error(`Title must be at most ${MAX_TITLE_LENGTH} characters`);
     }
 
-    if (input.description && input.description.length > 2000) {
-      throw new Error('Description must be at most 2000 characters');
+    if (input.description && input.description.length > MAX_DESCRIPTION_LENGTH) {
+      throw new Error(`Description must be at most ${MAX_DESCRIPTION_LENGTH} characters`);
     }
 
     let normalizedTags = input.tags || [];
@@ -45,8 +46,8 @@ export class TicketService {
       .map((tag) => tag.trim())
       .filter((tag) => tag.length > 0);
 
-    if (normalizedTags.length > 20) {
-      throw new Error('Maximum 20 tags allowed');
+    if (normalizedTags.length > MAX_TAGS) {
+      throw new Error(`Maximum ${MAX_TAGS} tags allowed`);
     }
 
     const uniqueTags = [...new Set(normalizedTags)];
@@ -120,12 +121,12 @@ export class TicketService {
       throw new Error('Title cannot be empty');
     }
 
-    if (input.title && input.title.trim().length > 200) {
-      throw new Error('Title must be at most 200 characters');
+    if (input.title && input.title.trim().length > MAX_TITLE_LENGTH) {
+      throw new Error(`Title must be at most ${MAX_TITLE_LENGTH} characters`);
     }
 
-    if (input.description && input.description.length > 2000) {
-      throw new Error('Description must be at most 2000 characters');
+    if (input.description && input.description.length > MAX_DESCRIPTION_LENGTH) {
+      throw new Error(`Description must be at most ${MAX_DESCRIPTION_LENGTH} characters`);
     }
 
     let normalizedTags = input.tags || [];
@@ -133,8 +134,8 @@ export class TicketService {
       .map((tag) => tag.trim())
       .filter((tag) => tag.length > 0);
 
-    if (normalizedTags.length > 20) {
-      throw new Error('Maximum 20 tags allowed');
+    if (normalizedTags.length > MAX_TAGS) {
+      throw new Error(`Maximum ${MAX_TAGS} tags allowed`);
     }
 
     const uniqueTags = [...new Set(normalizedTags)];

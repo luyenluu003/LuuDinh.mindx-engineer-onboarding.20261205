@@ -1,12 +1,6 @@
 import { TicketPriority, TicketStatus } from '../models/ticket.js';
 import { TicketService, UpdateTicketInput } from '../services/ticket.service.js';
-
-const MAX_DESCRIPTION_LENGTH = 2000;
-
-function isValidUUID(id: string): boolean {
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-  return uuidRegex.test(id);
-}
+import { MAX_DESCRIPTION_LENGTH, isValidUUID, normalizeTags, handleError } from '../utils/validation.js';
 
 export async function UpdateCommand(
   id: string,
@@ -27,8 +21,6 @@ export async function UpdateCommand(
     console.error('Error: At least one update field (status, priority, description, or tags) is required.');
     return;
   }
-
-  const service = new TicketService();
 
   const input: UpdateTicketInput = {};
 
@@ -60,23 +52,11 @@ export async function UpdateCommand(
   }
 
   if (args.tags !== undefined) {
-    const MAX_TAGS = 20;
-    const normalizedTags = args.tags
-      .flatMap((tag) => tag.split(/\s+/))
-      .map((tag) => tag.trim())
-      .filter((tag) => tag.length > 0);
-
-    let uniqueTags = [...new Set(normalizedTags)];
-
-    if (uniqueTags.length > MAX_TAGS) {
-      console.warn(`Warning: Too many tags (${uniqueTags.length}). Keeping first ${MAX_TAGS}.`);
-      uniqueTags = uniqueTags.slice(0, MAX_TAGS);
-    }
-
-    input.tags = uniqueTags;
+    input.tags = normalizeTags(args.tags);
   }
 
   try {
+    const service = new TicketService();
     const ticket = await service.update(trimmedId, input);
 
     console.log('Updated ticket:');
@@ -89,14 +69,10 @@ export async function UpdateCommand(
     }
     console.log(`  Updated: ${new Date(ticket.updatedAt).toLocaleString()}`);
   } catch (error) {
-    if (error instanceof Error) {
-      if (error.message === 'Ticket not found') {
-        console.error(`Error: Ticket with ID "${trimmedId}" not found.`);
-      } else {
-        console.error(`Error: ${error.message}`);
-      }
+    if (error instanceof Error && error.message === 'Ticket not found') {
+      console.error(`Error: Ticket with ID "${trimmedId}" not found.`);
     } else {
-      console.error('Error: An unexpected error occurred while updating the ticket.');
+      handleError(error, 'updating ticket');
     }
   }
 }

@@ -1,5 +1,6 @@
 import { TicketPriority, TicketStatus } from '../models/ticket.js';
 import { TicketService, TicketFilters } from '../services/ticket.service.js';
+import { handleError } from '../utils/validation.js';
 
 export async function ListCommand(args?: {
   status?: string;
@@ -8,7 +9,6 @@ export async function ListCommand(args?: {
 }): Promise<void> {
   try {
     const service = new TicketService();
-
     const filters: TicketFilters = {};
 
     if (args?.status) {
@@ -18,7 +18,8 @@ export async function ListCommand(args?: {
         return;
       }
       if (!Object.values(TicketStatus).includes(status as TicketStatus)) {
-        throw new Error(`Invalid status: ${args.status}`);
+        console.error(`Error: Invalid status "${args.status}". Valid values: ${Object.values(TicketStatus).join(', ')}`);
+        return;
       }
       filters.status = status as TicketStatus;
     }
@@ -30,7 +31,8 @@ export async function ListCommand(args?: {
         return;
       }
       if (!Object.values(TicketPriority).includes(priority as TicketPriority)) {
-        throw new Error(`Invalid priority: ${args.priority}`);
+        console.error(`Error: Invalid priority "${args.priority}". Valid values: ${Object.values(TicketPriority).join(', ')}`);
+        return;
       }
       filters.priority = priority as TicketPriority;
     }
@@ -60,10 +62,6 @@ export async function ListCommand(args?: {
       console.log('');
     });
   } catch (error) {
-    if (error instanceof Error) {
-      console.error(`Error: ${error.message}`);
-    } else {
-      console.error('Error: An unexpected error occurred while listing tickets.');
-    }
+    handleError(error, 'listing tickets');
   }
 }
