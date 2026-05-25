@@ -35,6 +35,7 @@ Options for 'update':
   <id>                      Ticket ID
   --status <status>         New status: open, in_progress, resolved, closed
   --priority <level>        New priority: low, medium, high, critical
+  --tags <tag1,tag2>       New tags (comma-separated)
 
 Examples:
   tickets create --title "Fix login bug" --priority high --tags bug,urgent
@@ -152,6 +153,7 @@ async function main(): Promise<void> {
           status: options.status as string | undefined,
           priority: options.priority as string | undefined,
           description: options.description as string | undefined,
+          tags: options.tags as string[] | undefined,
         });
         break;
       }

@@ -76,15 +76,23 @@ export async function CreateCommand(args: {
     }
   }
 
-  const ticket = await service.create(input);
+  try {
+    const ticket = await service.create(input);
 
-  console.log("Created ticket:");
-  console.log(`  ID: ${ticket.id}`);
-  console.log(`  Title: ${ticket.title}`);
-  console.log(`  Status: ${ticket.status}`);
-  console.log(`  Priority: ${ticket.priority}`);
-  if (ticket.tags.length > 0) {
-    console.log(`  Tags: ${ticket.tags.join(", ")}`);
+    console.log("Created ticket:");
+    console.log(`  ID: ${ticket.id}`);
+    console.log(`  Title: ${ticket.title}`);
+    console.log(`  Status: ${ticket.status}`);
+    console.log(`  Priority: ${ticket.priority}`);
+    if (ticket.tags.length > 0) {
+      console.log(`  Tags: ${ticket.tags.join(", ")}`);
+    }
+    console.log(`  Created: ${new Date(ticket.createdAt).toLocaleString()}`);
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(`Error: ${error.message}`);
+    } else {
+      console.error("Error: An unexpected error occurred while creating the ticket.");
+    }
   }
-  console.log(`  Created: ${new Date(ticket.createdAt).toLocaleString()}`);
 }

@@ -6,56 +6,64 @@ export async function ListCommand(args?: {
   priority?: string;
   tag?: string;
 }): Promise<void> {
-  const service = new TicketService();
+  try {
+    const service = new TicketService();
 
-  const filters: TicketFilters = {};
+    const filters: TicketFilters = {};
 
-  if (args?.status) {
-    const status = args.status.trim().toLowerCase();
-    if (status === '' || status === 'true') {
-      console.error('Error: Status filter cannot be empty.');
+    if (args?.status) {
+      const status = args.status.trim().toLowerCase();
+      if (status === '' || status === 'true') {
+        console.error('Error: Status filter cannot be empty.');
+        return;
+      }
+      if (!Object.values(TicketStatus).includes(status as TicketStatus)) {
+        throw new Error(`Invalid status: ${args.status}`);
+      }
+      filters.status = status as TicketStatus;
+    }
+
+    if (args?.priority) {
+      const priority = args.priority.trim().toLowerCase();
+      if (priority === '' || priority === 'true') {
+        console.error('Error: Priority filter cannot be empty.');
+        return;
+      }
+      if (!Object.values(TicketPriority).includes(priority as TicketPriority)) {
+        throw new Error(`Invalid priority: ${args.priority}`);
+      }
+      filters.priority = priority as TicketPriority;
+    }
+
+    if (args?.tag) {
+      const tag = args.tag.trim();
+      if (tag === '' || tag === 'true') {
+        console.error('Error: Tag filter cannot be empty.');
+        return;
+      }
+      filters.tag = tag;
+    }
+
+    const tickets = await service.findAll(filters);
+
+    if (tickets.length === 0) {
+      console.log('No tickets found.');
       return;
     }
-    if (!Object.values(TicketStatus).includes(status as TicketStatus)) {
-      throw new Error(`Invalid status: ${args.status}`);
+
+    console.log(`${tickets.length} ticket(s) found:\n`);
+
+    tickets.forEach((ticket) => {
+      const tagsStr = ticket.tags.length > 0 ? ` [${ticket.tags.join(', ')}]` : '';
+      console.log(`[${ticket.id.slice(0, 8)}] ${ticket.title}`);
+      console.log(`  Status: ${ticket.status} | Priority: ${ticket.priority}${tagsStr}`);
+      console.log('');
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(`Error: ${error.message}`);
+    } else {
+      console.error('Error: An unexpected error occurred while listing tickets.');
     }
-    filters.status = status as TicketStatus;
   }
-
-  if (args?.priority) {
-    const priority = args.priority.trim().toLowerCase();
-    if (priority === '' || priority === 'true') {
-      console.error('Error: Priority filter cannot be empty.');
-      return;
-    }
-    if (!Object.values(TicketPriority).includes(priority as TicketPriority)) {
-      throw new Error(`Invalid priority: ${args.priority}`);
-    }
-    filters.priority = priority as TicketPriority;
-  }
-
-  if (args?.tag) {
-    const tag = args.tag.trim();
-    if (tag === '' || tag === 'true') {
-      console.error('Error: Tag filter cannot be empty.');
-      return;
-    }
-    filters.tag = tag;
-  }
-
-  const tickets = await service.findAll(filters);
-
-  if (tickets.length === 0) {
-    console.log('No tickets found.');
-    return;
-  }
-
-  console.log(`${tickets.length} ticket(s) found:\n`);
-
-  tickets.forEach((ticket) => {
-    const tagsStr = ticket.tags.length > 0 ? ` [${ticket.tags.join(', ')}]` : '';
-    console.log(`[${ticket.id.slice(0, 8)}] ${ticket.title}`);
-    console.log(`  Status: ${ticket.status} | Priority: ${ticket.priority}${tagsStr}`);
-    console.log('');
-  });
 }

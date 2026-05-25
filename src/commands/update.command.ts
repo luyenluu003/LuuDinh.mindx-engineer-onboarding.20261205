@@ -10,7 +10,7 @@ function isValidUUID(id: string): boolean {
 
 export async function UpdateCommand(
   id: string,
-  args: { status?: string; priority?: string; description?: string }
+  args: { status?: string; priority?: string; description?: string; tags?: string[] }
 ): Promise<void> {
   const trimmedId = id.trim();
   if (!trimmedId || !isValidUUID(trimmedId)) {
@@ -18,8 +18,13 @@ export async function UpdateCommand(
     return;
   }
 
-  if (!args.status && !args.priority && !args.description) {
-    console.error('Error: At least one update field (status, priority, or description) is required.');
+  if (args.priority !== undefined && args.priority.trim() === '') {
+    console.error('Error: Priority cannot be empty.');
+    return;
+  }
+
+  if (!args.status && !args.priority && !args.description && !args.tags) {
+    console.error('Error: At least one update field (status, priority, description, or tags) is required.');
     return;
   }
 
@@ -54,6 +59,23 @@ export async function UpdateCommand(
     input.description = trimmedDesc;
   }
 
+  if (args.tags !== undefined) {
+    const MAX_TAGS = 20;
+    const normalizedTags = args.tags
+      .flatMap((tag) => tag.split(/\s+/))
+      .map((tag) => tag.trim())
+      .filter((tag) => tag.length > 0);
+
+    let uniqueTags = [...new Set(normalizedTags)];
+
+    if (uniqueTags.length > MAX_TAGS) {
+      console.warn(`Warning: Too many tags (${uniqueTags.length}). Keeping first ${MAX_TAGS}.`);
+      uniqueTags = uniqueTags.slice(0, MAX_TAGS);
+    }
+
+    input.tags = uniqueTags;
+  }
+
   try {
     const ticket = await service.update(trimmedId, input);
 
@@ -62,12 +84,19 @@ export async function UpdateCommand(
     console.log(`  Title: ${ticket.title}`);
     console.log(`  Status: ${ticket.status}`);
     console.log(`  Priority: ${ticket.priority}`);
+    if (ticket.tags.length > 0) {
+      console.log(`  Tags: ${ticket.tags.join(', ')}`);
+    }
     console.log(`  Updated: ${new Date(ticket.updatedAt).toLocaleString()}`);
   } catch (error) {
-    if (error instanceof Error && error.message === 'Ticket not found') {
-      console.error(`Error: Ticket with ID "${trimmedId}" not found.`);
+    if (error instanceof Error) {
+      if (error.message === 'Ticket not found') {
+        console.error(`Error: Ticket with ID "${trimmedId}" not found.`);
+      } else {
+        console.error(`Error: ${error.message}`);
+      }
     } else {
-      throw error;
+      console.error('Error: An unexpected error occurred while updating the ticket.');
     }
   }
 }

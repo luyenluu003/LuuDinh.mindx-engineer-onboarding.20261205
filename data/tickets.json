@@ -239,14 +239,14 @@
   {
     "title": "Test tags space",
     "description": "Test",
-    "status": "open",
+    "status": "closed",
     "priority": "medium",
     "tags": [
       "bug"
     ],
     "id": "f55c0aec-f764-4b0a-a8b5-afc880564919",
     "createdAt": "2026-05-23T08:28:59.462Z",
-    "updatedAt": "2026-05-23T08:28:59.462Z"
+    "updatedAt": "2026-05-25T12:38:58.686Z"
   },
   {
     "title": "Sửa lỗi đăng nhập",

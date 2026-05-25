@@ -12,22 +12,29 @@ export async function ShowCommand(id: string): Promise<void> {
     return;
   }
 
-  const service = new TicketService();
+  try {
+    const service = new TicketService();
+    const ticket = await service.findById(trimmedId);
 
-  const ticket = await service.findById(trimmedId);
+    if (!ticket) {
+      console.error(`Error: Ticket with ID "${trimmedId}" not found.`);
+      return;
+    }
 
-  if (!ticket) {
-    console.error(`Error: Ticket with ID "${trimmedId}" not found.`);
-    return;
+    console.log('Ticket Details:');
+    console.log(`  ID: ${ticket.id}`);
+    console.log(`  Title: ${ticket.title}`);
+    console.log(`  Description: ${ticket.description || '(none)'}`);
+    console.log(`  Status: ${ticket.status}`);
+    console.log(`  Priority: ${ticket.priority}`);
+    console.log(`  Tags: ${ticket.tags.length > 0 ? ticket.tags.join(', ') : '(none)'}`);
+    console.log(`  Created: ${new Date(ticket.createdAt).toLocaleString()}`);
+    console.log(`  Updated: ${new Date(ticket.updatedAt).toLocaleString()}`);
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(`Error: ${error.message}`);
+    } else {
+      console.error('Error: An unexpected error occurred while fetching the ticket.');
+    }
   }
-
-  console.log('Ticket Details:');
-  console.log(`  ID: ${ticket.id}`);
-  console.log(`  Title: ${ticket.title}`);
-  console.log(`  Description: ${ticket.description || '(none)'}`);
-  console.log(`  Status: ${ticket.status}`);
-  console.log(`  Priority: ${ticket.priority}`);
-  console.log(`  Tags: ${ticket.tags.length > 0 ? ticket.tags.join(', ') : '(none)'}`);
-  console.log(`  Created: ${new Date(ticket.createdAt).toLocaleString()}`);
-  console.log(`  Updated: ${new Date(ticket.updatedAt).toLocaleString()}`);
 }
