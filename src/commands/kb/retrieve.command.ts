@@ -1,7 +1,7 @@
 /**
  * KB Retrieve command - lấy chi tiết một document theo ID.
  */
-import { MockKBClient } from '../../clients/index.js';
+import { createKBClient } from '../../clients/index.js';
 
 export async function RetrieveCommand(args: { docId: string }): Promise<void> {
   const docId = args.docId.trim();
@@ -16,7 +16,7 @@ export async function RetrieveCommand(args: { docId: string }): Promise<void> {
     process.exit(1);
   }
 
-  const client = new MockKBClient();
+  const client = createKBClient();
   const document = await client.retrieve(docId);
 
   if (!document) {

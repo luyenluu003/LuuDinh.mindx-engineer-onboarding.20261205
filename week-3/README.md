@@ -1,8 +1,10 @@
-# Week 3 - Days 1-2: Knowledge Base CLI
+# Week 3: Knowledge Base CLI
 
 ## Tổng quan
 
-Tuần 3 tích hợp CLI với Knowledge Base API. Ngày 1-2 triển khai MockKBClient với 4 commands cơ bản.
+Tuần 3 tích hợp CLI với Knowledge Base API với 2 implementations:
+- **Days 1-2**: MockKBClient - test local với mock data
+- **Days 3-4**: HTTPKBClient - kết nối real KB API
 
 ## Cài đặt
 
@@ -16,6 +18,38 @@ npm link
 # Hoặc dùng npx
 npx tsx src/index.ts <command>
 ```
+
+## Chế độ hoạt động
+
+### Mock Mode (mặc định)
+
+```bash
+# Không cần server, dùng mock data sẵn có
+npx tsx src/index.ts kb search "team"
+```
+
+### HTTP Mode (Real API)
+
+```bash
+# Cần set environment variables
+$env:KB_CLIENT_TYPE="http"
+$env:KB_API_URL="http://localhost:3000/api/kb"
+
+# Với API key (nếu cần)
+$env:KB_API_KEY="your-api-key"
+
+# Chạy command
+npx tsx src/index.ts kb search "team"
+```
+
+### Environment Variables
+
+| Variable | Default | Mô tả |
+|----------|---------|--------|
+| `KB_CLIENT_TYPE` | `mock` | `mock` hoặc `http` |
+| `KB_API_URL` | `http://localhost:3000/api/kb` | Base URL của KB API |
+| `KB_API_KEY` | - | API key (nếu server yêu cầu) |
+| `KB_TIMEOUT` | `30000` | Timeout in milliseconds |
 
 ## KB Commands
 
@@ -126,6 +160,100 @@ Title: Test Doc
 Path: /test
 ```
 
+## API Contract (HTTP Mode)
+
+Server phải implement các endpoints sau:
+
+### POST /search
+
+```json
+Request:
+{
+  "query": "response",
+  "topK": 5,
+  "tags": ["template"]
+}
+
+Response:
+{
+  "results": [
+    {
+      "id": "doc-001",
+      "title": "Customer Response Template",
+      "content": "...",
+      "nodePath": "/templates/email",
+      "tags": ["template", "email"],
+      "matchType": "exact"
+    }
+  ]
+}
+```
+
+### POST /list
+
+```json
+Request:
+{
+  "nodePath": "/templates/email",
+  "limit": 10,
+  "tags": ["template"]
+}
+
+Response:
+{
+  "documents": [
+    {
+      "id": "doc-001",
+      "title": "Customer Response Template",
+      "content": "...",
+      "nodePath": "/templates/email",
+      "tags": ["template", "email"]
+    }
+  ]
+}
+```
+
+### POST /retrieve
+
+```json
+Request:
+{ "docId": "doc-001" }
+
+Response:
+{
+  "document": {
+    "id": "doc-001",
+    "title": "...",
+    "content": "...",
+    "nodePath": "/templates/email",
+    "tags": ["template"]
+  }
+}
+```
+
+### POST /add
+
+```json
+Request:
+{
+  "title": "New Template",
+  "content": "...",
+  "nodePath": "/templates/email",
+  "tags": ["template"]
+}
+
+Response:
+{
+  "document": {
+    "id": "doc-xxx",
+    "title": "New Template",
+    "content": "...",
+    "nodePath": "/templates/email",
+    "tags": ["template"]
+  }
+}
+```
+
 ## Mock Data
 
 MockKBClient có sẵn 3 documents:
@@ -144,9 +272,26 @@ CLI Commands (kb search/list/retrieve/add)
          ▼
 KBClient Interface
          │
-         ▼
-MockKBClient (hiện tại) / HTTPKBClient (Days 3-4)
+    ┌────┴────┐
+    │         │
+    ▼         ▼
+MockKBClient  HTTPKBClient
+(mock data)   (real API)
+              │
+              ▼
+         KB API Server
 ```
+
+## Error Handling
+
+### HTTP Mode Errors
+
+| Error | Nguyên nhân | Giải pháp |
+|-------|-------------|------------|
+| `Network error` | Server không chạy | Start KB API server |
+| `408 Request timeout` | Server phản hồi chậm | Tăng `KB_TIMEOUT` |
+| `API Error: 404` | Document không tồn tại | Kiểm tra doc ID |
+| `API Error: 401` | Sai API key | Kiểm tra `KB_API_KEY` |
 
 ## Chạy Tests
 
@@ -159,9 +304,35 @@ npm run test:unit -- tests/unit/clients
 
 # Chạy với watch mode
 npm run test:watch
+
+# Chạy integration tests
+npm run test:integration
 ```
 
-## Các bước tiếp theo
+## Cấu trúc code
 
-- **Ngày 3-4**: Triển khai HTTPKBClient để kết nối real KB API
-- **Ngày 5**: Tài liệu và final validation
+```
+src/
+├── index.ts                 # CLI entry point
+├── commands/
+│   └── kb/
+│       ├── search.command.ts
+│       ├── list.command.ts
+│       ├── retrieve.command.ts
+│       └── add.command.ts
+├── clients/
+│   ├── kb-client.interface.ts   # Interface
+│   ├── mock-kb-client.ts       # Mock implementation
+│   ├── http-kb-client.ts        # HTTP implementation
+│   └── kb-client-factory.ts     # Client factory
+├── models/
+│   └── kb-document.ts          # Types & interfaces
+└── config/
+    └── kb-api.config.ts        # Environment config
+```
+
+## Ngày 5: Final
+
+- Tài liệu hoàn chỉnh
+- Final validation
+- Integration testing với real server

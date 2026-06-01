@@ -1,7 +1,7 @@
 /**
  * KB Search command - tìm kiếm documents trong KB.
  */
-import { MockKBClient } from '../../clients/index.js';
+import { createKBClient } from '../../clients/index.js';
 import type { KBSearchQuery } from '../../models/kb-document.js';
 
 export async function SearchCommand(args: {
@@ -21,7 +21,7 @@ export async function SearchCommand(args: {
     console.warn('Warning: --top-k must be at least 1. Using default value: 5');
   }
 
-  const client = new MockKBClient();
+  const client = createKBClient();
 
   const searchQuery: KBSearchQuery = {
     query: trimmedQuery,

@@ -1,7 +1,7 @@
 /**
  * KB Add command - thêm document mới vào KB.
  */
-import { MockKBClient } from '../../clients/index.js';
+import { createKBClient } from '../../clients/index.js';
 import type { KBAddDocument } from '../../models/kb-document.js';
 import { readFileSync } from 'fs';
 
@@ -67,7 +67,7 @@ export async function AddCommand(args: {
     tags: args.tags,
   };
 
-  const client = new MockKBClient();
+  const client = createKBClient();
   const result = await client.add(newDoc);
 
   console.log('Document added successfully!');
