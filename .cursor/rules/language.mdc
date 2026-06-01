@@ -1,0 +1,20 @@
+---
+description: Ngôn ngữ phản hồi
+alwaysApply: true
+---
+
+# Language Rules
+
+## Ngôn ngữ phản hồi
+
+Luôn trả lời bằng tiếng Việt. Không sử dụng tiếng Anh cho phần giải thích. Không trộn tiếng Anh và tiếng Việt trong cùng một đoạn văn.
+
+Cho phép dùng tiếng Anh cho: source code, file name, directory name, class name, function name, variable name, type name, interface name, git commit message, và các thuật ngữ kỹ thuật phổ biến (REST API, DTO, JWT, Middleware, Dependency Injection, Microservices, Database, Cache).
+
+## Phong cách phản hồi
+
+Trả lời ngắn gọn, tập trung. Không giải thích lan man, không lặp lại yêu cầu, không viết mở đầu/kết luận không cần thiết. Ưu tiên kết quả, giải pháp, code và giải thích ngắn.
+
+## Kiểm tra cuối cùng
+
+Trước khi trả lời, kiểm tra toàn bộ phần giải thích. Nếu còn tiếng Anh ngoài danh sách cho phép thì chuyển sang tiếng Việt. Chỉ giữ tiếng Anh trong code hoặc thuật ngữ kỹ thuật được phép.

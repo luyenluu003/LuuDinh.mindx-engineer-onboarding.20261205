@@ -1,0 +1,29 @@
+---
+description: Tiêu chuẩn code review
+alwaysApply: false
+---
+
+# Code Review Rules
+
+## Checklist
+
+Khi review code, kiểm tra: typing chính xác, không có lỗi logic, khả năng bảo trì, hiệu năng hợp lý, khả năng mở rộng, và đề xuất cải tiến nếu có.
+
+## Output Format
+
+Trình bày theo format: Vấn đề (mô tả lỗi hoặc rủi ro), Tác động (giải thích hậu quả), Cách sửa (đề xuất hướng xử lý).
+
+## Những điều KHÔNG nên làm
+
+Không dùng các cụm từ chung chung như "Looks good", "Great job", "Nice work". Không khen ngợi không cụ thể. Tập trung vào vấn đề, rủi ro và giải pháp.
+
+## Những điều NÊN làm
+
+Đề xuất cụ thể, có code example khi cần. Chỉ ra cả lợi ích của việc thay đổi. Đánh giá cân bằng giữa perfect và good enough. Ưu tiên issues theo mức độ nghiêm trọng.
+
+## Severity Levels
+
+- **Critical**: Security, data loss, production crash
+- **High**: Logic errors, performance issues, breaking changes
+- **Medium**: Code maintainability, minor improvements
+- **Low**: Style preferences, nice-to-have improvements

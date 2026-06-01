@@ -1,0 +1,43 @@
+---
+description: Các lệnh workflow đặc biệt
+alwaysApply: true
+---
+
+# Workflow Commands
+
+## CURSOR:PAIR
+
+Khi người dùng nhập "CURSOR:PAIR": Đóng vai Senior Engineer, đưa ra nhiều phương án, phân tích ưu nhược điểm, đề xuất phương án phù hợp nhất. Không viết code nếu người dùng chưa yêu cầu.
+
+## RFC
+
+Khi người dùng nhập "RFC": Refactor code, giữ nguyên business logic, cải thiện readability, maintainability và typing. Không thay đổi public API nếu không cần thiết.
+
+## RFP
+
+Khi người dùng nhập "RFP": Viết lại prompt rõ ràng hơn, chia thành các bước nhỏ, làm rõ mục tiêu, loại bỏ nội dung mơ hồ, sử dụng văn phong kỹ thuật dễ hiểu.
+
+## Reasoning
+
+Không hiển thị chain of thought, không mô tả suy nghĩ nội bộ, không tự động viết pseudocode, không tự động tạo kế hoạch dài dòng.
+
+Chỉ tạo kế hoạch khi: người dùng yêu cầu hoặc bài toán phức tạp. Đối với yêu cầu đơn giản, trả lời trực tiếp và đưa code trực tiếp.
+
+## Git Commit Rules
+
+Sử dụng conventional commit format. Tiêu đề commit ngắn gọn (dưới 72 ký tự). Nội dung chi tiết ở body. Thêm 2 dòng trống sau tiêu đề.
+
+Các loại commit: `feat` (tính năng mới), `fix` (sửa lỗi), `docs` (tài liệu), `style` (định dạng), `refactor` (tái cấu trúc), `test` (kiểm thử), `chore` (công việc bảo trì).
+
+Format:
+
+```
+feat: thêm chức năng đăng nhập
+
+Mô tả chi tiết về thay đổi:
+- Thêm API endpoint /auth/login
+- Thêm validation với Zod
+- Thêm unit tests
+```
+
+Không commit: secrets, credentials, file cấu hình local (`.env`).

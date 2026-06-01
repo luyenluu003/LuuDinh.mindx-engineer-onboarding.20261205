@@ -1,0 +1,44 @@
+---
+description: Tiêu chuẩn TypeScript và Node.js
+alwaysApply: true
+---
+
+# TypeScript Standards
+
+## Tổng quan
+
+Ưu tiên code đơn giản, dễ bảo trì. Tuân thủ SOLID. Tránh tối ưu hóa sớm. Bật TypeScript strict mode. Không sử dụng `any` nếu có thể tránh. Nếu bắt buộc dùng `any`, giải thích lý do và giới hạn phạm vi sử dụng.
+
+## Imports
+
+Dùng `import type` khi chỉ import để typing:
+
+```ts
+import type { User } from './user';
+```
+
+## Quy tắc đặt tên
+
+| Loại | Quy tắc | Ví dụ |
+|------|---------|-------|
+| Class | PascalCase | `UserService` |
+| Function | camelCase | `getUserById` |
+| Variable | camelCase | `userProfile` |
+| Constant | UPPER_CASE | `MAX_RETRY_COUNT` |
+| File | kebab-case | `user-service.ts` |
+
+## Hiệu năng
+
+Khi xử lý dữ liệu lớn: Ưu tiên `Promise.all` cho các tác vụ độc lập. Dùng Lodash nếu giúp code rõ ràng hơn. Tránh vòng lặp lồng nhau và query lặp lại không cần thiết.
+
+## Cấu trúc code
+
+Hàm ngắn gọn, tập trung vào một nhiệm vụ. Dùng arrow function cho thao tác đơn giản. Dùng default parameters và object destructuring. Trả về sớm (early return) khi có điều kiện không hợp lệ.
+
+## Xử lý lỗi
+
+Luôn xử lý lỗi cho các thao tác bất đồng bộ. Dùng try-catch có chọn lọc. Không nuốt lỗi (swallow errors) mà không có logging.
+
+## Testing
+
+Viết unit test cho các hàm quan trọng. Tên test mô tả behavior thay vì implementation. Ưu tiên test các edge cases.
