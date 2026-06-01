@@ -1,7 +1,7 @@
 /**
  * KB List command - liệt kê documents theo node hoặc filters.
  */
-import { MockKBClient } from '../../clients/index.js';
+import { createKBClient } from '../../clients/index.js';
 import type { KBListQuery } from '../../models/kb-document.js';
 
 export async function ListCommand(args: {
@@ -23,7 +23,7 @@ export async function ListCommand(args: {
     }
   }
 
-  const client = new MockKBClient();
+  const client = createKBClient();
 
   const listQuery: KBListQuery = {
     nodePath: args.nodePath?.trim(),

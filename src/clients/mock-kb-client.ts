@@ -142,74 +142,35 @@ export class MockKBClient implements KBClient {
     const titleLower = doc.title.toLowerCase();
     const contentLower = doc.content.toLowerCase();
     const tagsString = doc.tags.join(' ').toLowerCase();
+    const queryLower = query.toLowerCase();
 
-    if (titleLower.includes(query) || tagsString.includes(query)) {
+    if (titleLower.includes(queryLower) || tagsString.includes(queryLower)) {
       return 'exact';
     }
 
-    if (contentLower.includes(query)) {
+    if (contentLower.includes(queryLower)) {
       return 'partial';
     }
 
-    const words = query.split(' ').filter((w) => w.length > 2);
-    const titleWords = titleLower.split(/\s+/);
+    const queryWords = queryLower.split(/\s+/).filter((w) => w.length > 0);
     const contentWords = contentLower.split(/\s+/);
+    const titleWords = titleLower.split(/\s+/);
 
-    let matchCount = 0;
-    for (const word of words) {
+    let matchedWords = 0;
+    for (const queryWord of queryWords) {
       if (
-        titleWords.some((tw) => this.isFuzzyMatch(word, tw)) ||
-        contentWords.some((cw) => this.isFuzzyMatch(word, cw))
+        titleWords.some((tw) => tw.startsWith(queryWord)) ||
+        contentWords.some((cw) => cw.startsWith(queryWord))
       ) {
-        matchCount++;
+        matchedWords++;
       }
     }
 
-    if (matchCount >= Math.min(2, words.length)) {
+    if (matchedWords === queryWords.length && queryWords.length > 0) {
       return 'fuzzy';
     }
 
     return null;
-  }
-
-  private isFuzzyMatch(word: string, target: string): boolean {
-    if (target.includes(word)) {
-      return true;
-    }
-
-    const maxDistance = Math.floor(Math.min(word.length, target.length) / 3);
-    return this.levenshteinDistance(word, target) <= Math.max(1, maxDistance);
-  }
-
-  private levenshteinDistance(a: string, b: string): number {
-    if (a.length === 0) return b.length;
-    if (b.length === 0) return a.length;
-
-    const matrix: number[][] = [];
-
-    for (let i = 0; i <= b.length; i++) {
-      matrix[i] = [i];
-    }
-
-    for (let j = 0; j <= a.length; j++) {
-      matrix[0]![j] = j;
-    }
-
-    for (let i = 1; i <= b.length; i++) {
-      for (let j = 1; j <= a.length; j++) {
-        if (b.charAt(i - 1) === a.charAt(j - 1)) {
-          matrix[i]![j] = matrix[i - 1]![j - 1]!;
-        } else {
-          matrix[i]![j] = Math.min(
-            matrix[i - 1]![j - 1]! + 1,
-            matrix[i]![j - 1]! + 1,
-            matrix[i - 1]![j]! + 1
-          );
-        }
-      }
-    }
-
-    return matrix[b.length]![a.length]!;
   }
 
   private getRelevanceScore(result: KBSearchResult, query: string): number {
