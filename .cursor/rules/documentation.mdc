@@ -1,0 +1,36 @@
+---
+description: Tiêu chuẩn viết tài liệu
+alwaysApply: false
+---
+
+# Documentation Rules
+
+## Tổng quát
+
+Viết bằng tiếng Việt. Ngắn gọn, rõ ràng. Dùng câu chủ động. Trình bày theo danh sách nếu phù hợp.
+
+## JSDoc
+
+Tất cả code mới phải có JSDoc. Mỗi function phải có mô tả ngắn gọn mục đích. Các tham số và giá trị trả về phải được ghi chú rõ.
+
+```ts
+/**
+ * Lấy thông tin người dùng theo id.
+ *
+ * @param userId - Id người dùng
+ * @returns Thông tin người dùng hoặc null nếu không tìm thấy
+ */
+const getUserById = async (userId: string) => {};
+```
+
+## README
+
+README cần có: mục đích dự án, hướng dẫn cài đặt, cấu hình, cách chạy, kiến trúc, ví dụ sử dụng.
+
+## Changelog
+
+Khi thay đổi lớn, ghi vào CHANGELOG: phiên bản, ngày, danh sách thay đổi (feat, fix, breaking changes).
+
+## Inline comments
+
+Chỉ comment khi cần giải thích logic phức tạp, trade-offs hoặc các ràng buộc không thể hiện qua code. Không comment những gì đã rõ ràng từ code.
