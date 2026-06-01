@@ -29,7 +29,7 @@ This week extends the CLI tool from Week 2 to integrate with an external Knowled
 
 ## Acceptance Criteria
 
-- [ ] CLI can query external Knowledge Base API for real-world use cases (templates, documents, team info)
-- [ ] Both mock and HTTP clients work correctly, swappable via environment variable
-- [ ] All 4 commands (search, list, retrieve, add) functional end-to-end
-- [ ] Integration with real KB API tested and documented
+- [x] CLI can query external Knowledge Base API for real-world use cases (templates, documents, team info)
+- [x] Both mock and HTTP clients work correctly, swappable via environment variable
+- [x] All 4 commands (search, list, retrieve, add) functional end-to-end
+- [x] Integration with real KB API tested and documented
