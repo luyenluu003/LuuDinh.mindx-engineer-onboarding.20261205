@@ -240,3 +240,41 @@ Tránh lạm dụng vì việc đặt quá nhiều vấn đề cho câu hỏi đ
 
 ### 6.2 Solution Exploration
 
+**Testing Levels:**
+
+Là cấp độ kiểm thử khác nhau trong quá trình phát triển phần mềm. Gồm unit test để kiểm tra class và method riêng lẻ, integration test để kiểm tra sự tương tác qua lại, E2E test mô phỏng luồng nghiệp vuk người dùng.
+
+**Testing framework:**
+
+Là tập hợp các công cụ và thư viện để hỗ trợ việc viết, thực thi và quản lý test. Ví dụ như là Junit 5 để viết test, Mockito để mock dependecy, AssertJ để viết assertion dễ đọc hơn,...
+
+**Mocking strategy:**
+
+Là cách xác định xem những dependecy nào cần được giả lập trong quá trình kiểm thử. Ví dụ như Unit test, thường mock dependecy bên ngoài như repository, External API,...
+
+### 6.3 Iterative Refinement
+
+Là phương pháp cải tiến qua nhiều vòng lặp nhỏ. Thay vì cố gắng tạo ra giải pháp ngay từ đầu, thường xây dựng một phiên bản đơn giản hoạt động trước sau đó tiếp tục đánh giá, kiểm thử và cải thiện dựa trên phản hồi yêu cầu mới.
+
+### 6.4 Key Learnings
+
+AI giúp tăng tốc độ phát triển phần mềm nhưng nó cũng không đảm bảo tính đúng đắn của nghiệp vụ. Vì thế nên phải code review, testing, validation checklist để kiếm trước lại kết quả.
+Đặt câu hỏi nhiều lớp và cải tiến dần qua nhiều vòng lặp thường mang lại kết quả tốt hơn thay vì chấp nhận kết quả đầu tiên.
+
+---
+
+## 7. Key Takeaways
+
+1. **AI là công cụ hợp tác, không phải người thay thế** - AI giúp nhanh hơn nhưng mình vẫn phải là người kiến trúc sư. AI không biết business context, requirements phải do mình define.
+
+2. **Hỏi theo lớp thay vì hỏi tất cả một lúc** - Bắt đầu từ Research (định nghĩa), rồi Brief (chi tiết), Example (ví dụ), cuối cùng Validation (xác nhận). Cách này giúp hiểu sâu hơn thay vì accept answer ngay.
+
+3. **Không bao giờ accept AI answer đầu tiên** - Code đầu tiên hiếm khi hoàn hảo. Phải question, tìm edge cases, verify lại. Nhiều khi AI viết pass hết tests nhưng logic sai.
+
+4. **TDD giúp kiểm soát AI-generated code** - Viết test trước giúp define requirements rõ ràng. AI code pass tests = đúng spec. Tests cũ là regression suite khi AI sửa bug.
+
+5. **Testing levels có tỷ lệ 70/20/10** - 70% unit tests, 20% integration tests, 10% E2E tests. Không nên over-test hay under-test.
+
+6. **Common mistakes cần tránh** - Over-testing, weak assertions, testing implementation details.
+
+7. **Guardrails cho AI code** - Static analysis, code review bắt buộc, security scanning, mutation testing. AI có tỷ lệ security issues cao hơn, cần scan kỹ.
