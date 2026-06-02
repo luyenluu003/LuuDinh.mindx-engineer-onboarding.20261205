@@ -107,3 +107,41 @@ Không sử dụng E2E cho các logic nhỏ, utility hoặc tất cả API vì c
 Ý tưởng là phần lớn test là unit test nhanh và chi phí thấp, một phần nhỏ là integration test là tương tác giữa các thành phần và số lượng E2E thấp nhất vì chi phí thực thi và bảo trì cao, tỉ lệ có thể thay đổi tuỳ theo đặc thù dự án.
 
 ---
+
+## 3. CLI Testing Examples
+
+### 3.1 Commands Testing
+
+Là kiểm thử các lệnh CLI để đảm bảo commands nhận tham số đúng thực thi đúng logic và trả về kết quả phù hợp.
+
+**Khi nào nên dùng:**
+
+Thường áp dụng cho các command line, batch jobs hoặc các công cụ tự động hoá.
+
+**Không nên dùng:**
+
+Với các commands đơn giản hoặc logic kiểm thử đầy đủ ở tầng service rồi thì chỉ càn kiểm tra luồng command thay vì viết nhiều test trùng lặp.
+
+### 3.2 Validation Testing
+
+Là hoạt động kiểm thử nhằm xác minh dữ liệu đầu vào hoặc kết quả tuân thủ các quy tắc rằng buộc đẫ được định nghĩa. Mục tiêu của nó là ngăn dữ liệu không hợp lệ vào hệ thống và đảm bảo tính toàn vẹn dữ liệu.
+
+**Những thứ hay gặp:**
+
+Thường áp dụng Validation Testing cho API request, form nhập liệu, dữ liệu import và các business rule như giới hạn độ dài, định dạng email hoặc điều kiện nghiệp vụ như số dư tài khoản phải đủ trước khi thực hiện giao dịch,...
+
+### 3.3 File Storage Testing
+
+Là hoạt động kiểm thử với các chức năng liên quan đến file như upload, download, cập nhập và xoá file. cần kiểm thử quan trọng như định dạng file, kích thước, quyền truy cập, xử lý file đúng cách. Mục tiêu là đảm bảo tính toàn vẹn, khả năng truy cập và bảo mật của file trong hệ thống.
+
+### 3.4 Error Handling Testing
+
+Là hoạt động kiểm thử các tình huống lỗi và ngoại lệ để đảm bảo hệ thống phản hồi cho mình đúng cách, không crash và không cung cấp thông tin phù hợp cho người dùng thấy.
+
+**Ưu điểm:**
+
+Giúp phát hiện sớm các tình huống bâts thường, tăng ổn định, trải nghiệm cho người dùng và giảm rủi ro.
+
+**Nhược điểm:**
+
+Số lượng test cases tăng nhanh, chi phí bảo trì cao và khó bao phủ toàn bộ các lỗi có thể xảy ra vì thế nên ưu tiên các chức năng rủi ro cao như thanh toán, chuyển tiền,... hoặc tích hợp hệ thống bên ngoài.
