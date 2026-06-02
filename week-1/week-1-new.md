@@ -218,3 +218,25 @@ Tác hại lớn nhất là tạo cảm giác an toàn giả, code có thẻe co
 **Cách tránh:**
 
 Đê tránh đièu đó không đánh giá code có chạy được hay không mà dựa trên nó có đáp ứng requirement hay không. Mọi output từ AI cần được review và test trước khi cho vào production.
+
+---
+
+## 6. Evidence: 3 Workflows Applied
+
+### 6.1 Layered Questioning
+
+là kỹ thuật đặt câu hỏi nhiều tầng để hiểu sau về thông tin thay vì chấp nhận câu trả lời đầu tiên. Khi làm việc với AI thường tiếp tục hỏi nguyên nhân, cách hoạt động, ưu nhược điểm, các trường hợp ngoại lệ và điều kiện áp dụng.
+Cách này giúp mình tránh hiểu sai vấn đề và đánh giá chính xác chất lượng câu trả lời do AI tạo ra.
+
+Research -> Brief -> Example -> Validation
+
+**Khi nào sử dụng:**
+
+Khi cần đào sâu vào một vấn đề kỹ thuật, phân tích yêu cầu nghiệp vụ hoặc đánh giá code do AI tạo ra. Kỹ thuật này giúp đảm bảo làm rõ nguyên nhân, cách hoạt động, điều kiện áp dụng và tuỏnbgwf hợp ngoại lệ, nếu không áp dụng sẽ hiểu cách hời hợt và bỏ sót edge cases quan trọng.
+
+**Hạn chế:**
+
+Tránh lạm dụng vì việc đặt quá nhiều vấn đề cho câu hỏi đơn giản có thể làm chậm tiến độ phát triển.
+
+### 6.2 Solution Exploration
+
