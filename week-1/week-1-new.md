@@ -50,3 +50,60 @@ Trong giai đoạn tái cấu trúc thì mình vẫn đang ở trong vùng an to
 ### 1.5 Tại sao TDD quan trọng với AI-Generated Code?
 
 Vì AI-generated code rất nhanh nhưng không đảm bảo mình đúng nghiệp vụ hoặc xử lý đầy đủ các edge cases, Vì thế áp dụng TDD, các test đóng vai trò như đặc tả nên dù là developer hay AI nó cũng phải vượt qua được yêu cầu bài test đã, trong thời đại này lập trình viên không cần gõ code nhanh mà là viết đúng yêu cầu, test đúng và đánh giá được chất lượng code do AI sinh ra.
+
+---
+
+## 2. Testing Levels Comparison
+
+### 2.1 Unit Tests
+
+**Định nghĩa:**
+
+Unit tests là loại kiểm thử dùng để xác minh một đơn vị nhỏ nhất trong chương trình, thường là method hoặc class hoạt động đúng như yêu cầu. Nó hoạt động độc lập với hệ thống bên ngoài như database, message queue hoặc API,... mục tiêu là phát hiện được lỗi sớm để refactor code an toàn và đảm bảo logic của nó hoạt động chính xác.
+
+**Khi nào nên dùng:**
+
+Thường ưu tiên cho các phần có business logic phức tạp như tính toán, xử lý nghiệp vụ payment, order hoặc các utility dùng nhiều nơi. Áp dụng cho cấu trúc dự án lớn, nhiều người làm việc cùng nhau hoặc khi tái cấu trúc code vẫn đảm bảo hệ thống.
+
+**Không nên dùng:**
+
+Với các thành phần đơn giản như DTO, entity hoặc CRUD chỉ gọi repository mà không có logic đáng kể thì không nên áp dụng unit tests mà tập trung vào integration test để tối ưu chi phí bảo trì tests.
+
+### 2.2 Integration Tests
+
+**Định nghĩa:**
+là tích hợp 1 nhóm các module riêng lẻ với nhau cùng với các unit test riêng lẻ trong từng module, nó nhằm xác minh hệ thống hoạt động đúng khi kết hợp với nhau, nó sử dụng các thành phần thật như database để kiểm tra luồng xử lý thực tế từ controller đến service rồi đến repostiory.
+
+
+**Khi nào nên dùng:**
+
+Hệ thống có nhiều module phụ thuộc nhau, tương tác giữa các thành phần hệ thống như controller, service, repository, database, gọi API nội bộ hoặc bên ngoài hoặc muốn kiểm tra luồng nghiệp vụ quan trọng.
+
+**Không nên dùng:**
+
+Khi hệ thống không cần đến database hoặc spring context, không cần tương tác giữa các component thì không nen dùng, unit test nhanh đơn giản và hiệu quả hơn.
+
+### 2.3 End-to-End (E2E) Tests
+
+**Định nghĩa:**
+
+Là kiểm thử mô phỏng hành vi của người dùng từ đầu đến cuối, khác với 2 cái trên thì nó xác minh toàn bộ hệ thống từ fe, ba, database và các dịch vụ liên quan hoạt động đúng cùng nhau.
+
+**Khi nào nên dùng:**
+
+Nên dùng khi các luồng nghiệp vụ quan trọng như đăng nhập, đăng ký, đặt hàng thanh toán, ... những luồng cần xác nhận toàn bộ hệ thống khi tích hợp với nhau.
+
+**Không nên dùng:**
+
+Không sử dụng E2E cho các logic nhỏ, utility hoặc tất cả API vì chi phí thực thi và bảo trì cao, với các trường hợp đó 2 cái trên ổn và nhanh hơn.
+
+### 2.4 Tỷ lệ đề xuất và giải thích
+
+**Đề xuất:**
+Đề xuất tỷ lệ 70/20/10 - tức 70% unit test, 20% integration tests, và 10% E2E tests.
+
+**Lý do:**
+
+Ý tưởng là phần lớn test là unit test nhanh và chi phí thấp, một phần nhỏ là integration test là tương tác giữa các thành phần và số lượng E2E thấp nhất vì chi phí thực thi và bảo trì cao, tỉ lệ có thể thay đổi tuỳ theo đặc thù dự án.
+
+---
