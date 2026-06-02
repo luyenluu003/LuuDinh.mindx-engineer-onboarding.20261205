@@ -145,3 +145,98 @@ Giúp phát hiện sớm các tình huống bâts thường, tăng ổn định,
 **Nhược điểm:**
 
 Số lượng test cases tăng nhanh, chi phí bảo trì cao và khó bao phủ toàn bộ các lỗi có thể xảy ra vì thế nên ưu tiên các chức năng rủi ro cao như thanh toán, chuyển tiền,... hoặc tích hợp hệ thống bên ngoài.
+
+---
+
+## 4. AI Validation Strategy
+
+### 4.1 How Tests Help Verify AI Code
+
+AI có thể tạo code rất nhanh nhưng nó cũng sẽ không đảm bảo code đúng với yêu cầu nghiệp vụ hoặc xử lý đầy đủ các trường hợp biên. Các loại test như Unit test, Integration test và E2E giúp xác minh hành vi code 1 cách có độc lập.
+Test đóng vai trò cơ chế đảm bảo code được sinh ra không chỉ compile mà còn hoạt động đúng theo yêu cầu hệ thống
+AI có thể viét code nhưng test mới chứng minh code nó đúng.
+
+### 4.2 Guardrails for AI-Generated Code
+
+- Là cơ chế đảm bảo code được sinh ra đáp ứng đủ chất lượng trước khi đưa vào hệ thống.
+- AI có thể tăng tốc đọ phát triển phần mèm nhưng guardrails là yếu tố đảm bảo tính đúng đắn, bảo mật và khả năng duy trì code.
+- AI giúp code nhanh hơn còn guardrails giúp đảm bảo code có đủ an toàn và đúng để đưa vào production.
+
+### 4.3 AI Validation Checklist
+
+Khi đánh giá AI-generated code, thường sử dụng check list gồm: xác minh code có đáp ứng được yêu cầu nghiệp vụ hay không, kiểm tra unit tests và integration test, xem xét các edge cases và error handling, đánh giá rủi ro bảo mật, đảm bảo hiệu năng và code tuân thủ kiến trúc của dự án.
+AI có thể tạo code nhanh nhưng trách nhiệm xác nhận tính đúng đắn là viẹc của kỹ sư phần mềm.
+
+---
+
+## 5. Common Mistakes
+
+### 5.1 Over-Testing
+
+Là việc viết quá nhiều test cho các phần ít rủi ro hoặc ít giá trị, dẫn đến chi phí bảo trì cao hơn lợi ích nhận được.
+
+**Tác hại:**
+
+Làm tăng chi phí bảo trì, kéo dài thời gian chạy CI/CD, làm chậm tốc đọ phat triển, refactor trở nên khó khăn hơn. ngoài ra tập trung vào test ít giá trị có thể tạo cảm giác an toàn giả về chất lượng phần mềm.
+
+**Cách tránh:**
+
+Ưu tiên kiểm thử các business logic quan trọng, tập trung vào hành vi của hệ thống thay vì triển khai và áp dụng test pymamid để cân bằng giữa unit test, integration test và E2E tests.
+
+### 5.2 Weak Assertions
+
+Là các assertion không xác minh được những kết quả quan trọng của hệ thống, ví dụ như kiểu chỉ kiểm tra http status mà không kiểm tra dữ liệu thực tế. Những assertion này có thể khiến test pass dù business logic bị lỗi tạo cảm giác an toàn giả về chât lượng phần mềm.
+
+**Tác hại:**
+
+Tạo cảm giác an toàn giả vì test vẫn pass dù business logic có thể đã sai.
+
+**Cách tránh:**
+
+Thường assert vào business outcome, kiểm tra dữ liệu cụ thể, các field quan trọng, đảm bảo business rule bị phá vỡ thì test sẽ fail ngay.
+
+### 5.3 Testing Implementation Details
+
+Làm test trở nên mong manh vì phụ thuộc vào cách triển khai bên trong thay vì bên ngoài của hệ thống. Khi rafactor code mà business logic không thay đổi, các test vẫn có thể fail, làm tăng chi phí bảo trì và cản trở cải tiến mã nguồn.
+
+**Tác hại:**
+
+Khiến test dễ fail khi rafactor code, làm tăng chi phí bảo trì và caản trở việc cải tiến mã nguồn.
+
+**Cách tránh:**
+
+Đê tránh vấn đề này ưu tiên kiểm tra business outcome và behavior của hệ thống qua assertions thay vì xác minh chi tiết nội bộ được gọi.
+
+### 5.4 Blindly Trusting AI
+
+Là việc sử dụng code hoặc giải pháp do AI đề ra mà không thực hiện review, kiểm thử và xác minh lại. Điều này có thể dẫn đến bug nghiệp vụ, lỗ hổng bảo mật, vấn đề hiệu năng và vi phạm kiến trúc hệ thống.
+
+**Tác hại:**
+
+Tác hại lớn nhất là tạo cảm giác an toàn giả, code có thẻe compile và chạy nhưng vẫn sai business logic hoặc tồn tại các vấn đề bảo mật và hiệu năng.
+
+**Cách tránh:**
+
+Đê tránh đièu đó không đánh giá code có chạy được hay không mà dựa trên nó có đáp ứng requirement hay không. Mọi output từ AI cần được review và test trước khi cho vào production.
+
+---
+
+## 6. Evidence: 3 Workflows Applied
+
+### 6.1 Layered Questioning
+
+là kỹ thuật đặt câu hỏi nhiều tầng để hiểu sau về thông tin thay vì chấp nhận câu trả lời đầu tiên. Khi làm việc với AI thường tiếp tục hỏi nguyên nhân, cách hoạt động, ưu nhược điểm, các trường hợp ngoại lệ và điều kiện áp dụng.
+Cách này giúp mình tránh hiểu sai vấn đề và đánh giá chính xác chất lượng câu trả lời do AI tạo ra.
+
+Research -> Brief -> Example -> Validation
+
+**Khi nào sử dụng:**
+
+Khi cần đào sâu vào một vấn đề kỹ thuật, phân tích yêu cầu nghiệp vụ hoặc đánh giá code do AI tạo ra. Kỹ thuật này giúp đảm bảo làm rõ nguyên nhân, cách hoạt động, điều kiện áp dụng và tuỏnbgwf hợp ngoại lệ, nếu không áp dụng sẽ hiểu cách hời hợt và bỏ sót edge cases quan trọng.
+
+**Hạn chế:**
+
+Tránh lạm dụng vì việc đặt quá nhiều vấn đề cho câu hỏi đơn giản có thể làm chậm tiến độ phát triển.
+
+### 6.2 Solution Exploration
+
