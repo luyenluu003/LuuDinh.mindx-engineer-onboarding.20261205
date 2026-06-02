@@ -240,3 +240,23 @@ Tránh lạm dụng vì việc đặt quá nhiều vấn đề cho câu hỏi đ
 
 ### 6.2 Solution Exploration
 
+**Testing Levels:**
+
+Là cấp độ kiểm thử khác nhau trong quá trình phát triển phần mềm. Gồm unit test để kiểm tra class và method riêng lẻ, integration test để kiểm tra sự tương tác qua lại, E2E test mô phỏng luồng nghiệp vuk người dùng.
+
+**Testing framework:**
+
+Là tập hợp các công cụ và thư viện để hỗ trợ việc viết, thực thi và quản lý test. Ví dụ như là Junit 5 để viết test, Mockito để mock dependecy, AssertJ để viết assertion dễ đọc hơn,...
+
+**Mocking strategy:**
+
+Là cách xác định xem những dependecy nào cần được giả lập trong quá trình kiểm thử. Ví dụ như Unit test, thường mock dependecy bên ngoài như repository, External API,...
+
+### 6.3 Iterative Refinement
+
+Là phương pháp cải tiến qua nhiều vòng lặp nhỏ. Thay vì cố gắng tạo ra giải pháp ngay từ đầu, thường xây dựng một phiên bản đơn giản hoạt động trước sau đó tiếp tục đánh giá, kiểm thử và cải thiện dựa trên phản hồi yêu cầu mới.
+
+### 6.4 Key Learnings
+
+AI giúp tăng tốc độ phát triển phần mềm nhưng nó cũng không đảm bảo tính đúng đắn của nghiệp vụ. Vì thế nên phải code review, testing, validation checklist để kiếm trước lại kết quả.
+Đặt câu hỏi nhiều lớp và cải tiến dần qua nhiều vòng lặp thường mang lại kết quả tốt hơn thay vì chấp nhận kết quả đầu tiên.
