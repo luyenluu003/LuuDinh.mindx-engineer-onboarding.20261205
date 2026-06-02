@@ -260,3 +260,21 @@ Là phương pháp cải tiến qua nhiều vòng lặp nhỏ. Thay vì cố g�
 
 AI giúp tăng tốc độ phát triển phần mềm nhưng nó cũng không đảm bảo tính đúng đắn của nghiệp vụ. Vì thế nên phải code review, testing, validation checklist để kiếm trước lại kết quả.
 Đặt câu hỏi nhiều lớp và cải tiến dần qua nhiều vòng lặp thường mang lại kết quả tốt hơn thay vì chấp nhận kết quả đầu tiên.
+
+---
+
+## 7. Key Takeaways
+
+1. **AI là công cụ hợp tác, không phải người thay thế** - AI giúp nhanh hơn nhưng mình vẫn phải là người kiến trúc sư. AI không biết business context, requirements phải do mình define.
+
+2. **Hỏi theo lớp thay vì hỏi tất cả một lúc** - Bắt đầu từ Research (định nghĩa), rồi Brief (chi tiết), Example (ví dụ), cuối cùng Validation (xác nhận). Cách này giúp hiểu sâu hơn thay vì accept answer ngay.
+
+3. **Không bao giờ accept AI answer đầu tiên** - Code đầu tiên hiếm khi hoàn hảo. Phải question, tìm edge cases, verify lại. Nhiều khi AI viết pass hết tests nhưng logic sai.
+
+4. **TDD giúp kiểm soát AI-generated code** - Viết test trước giúp define requirements rõ ràng. AI code pass tests = đúng spec. Tests cũ là regression suite khi AI sửa bug.
+
+5. **Testing levels có tỷ lệ 70/20/10** - 70% unit tests, 20% integration tests, 10% E2E tests. Không nên over-test hay under-test.
+
+6. **Common mistakes cần tránh** - Over-testing, weak assertions, testing implementation details.
+
+7. **Guardrails cho AI code** - Static analysis, code review bắt buộc, security scanning, mutation testing. AI có tỷ lệ security issues cao hơn, cần scan kỹ.
